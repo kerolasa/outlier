@@ -80,41 +80,22 @@ static int __attribute__((__pure__)) comp_double(const void *a, const void *b)
 	return f1 < f2 ? -1 : f1 > f2 ? 1 : 0;
 }
 
-int main(int argc, char **argv)
+static int process_file(FILE *fd, double *list, size_t *list_sz)
 {
-	double *list, *lp, d, mean, q1, q3, range;
-	int matches, c;
-	size_t n = 0, list_sz = 0x8000;
+	double *lp, d, mean, q1, q3, range;
+	size_t n = 0;
+	int matches;
 
-	static const struct option longopts[] = {
-		{"version", no_argument, NULL, 'V'},
-		{"help", no_argument, NULL, 'h'},
-		{NULL, 0, NULL, 0}
-	};
-
-	while ((c = getopt_long(argc, argv, "Vh", longopts, NULL)) != -1) {
-		switch (c) {
-		case 'V':
-			printf("%s version %s", PACKAGE_NAME, PACKAGE_VERSION);
-			return EXIT_SUCCESS;
-		case 'h':
-			usage(stdout);
-		default:
-			usage(stderr);
-		}
-	}
-
-	list = xmalloc(list_sz * sizeof(double));
 	lp = list;
-	while (!feof(stdin)) {
+	while (!feof(fd)) {
 		matches = scanf("%le", &d);
 		if (matches == 0 || isnan(d))
 			continue;
 		*lp = d;
 		n++;
-		if (list_sz < n) {
-			list_sz *= 2;
-			list = xrealloc(list, (list_sz * sizeof(double)));
+		if (*list_sz < n) {
+			*list_sz *= 2;
+			list = xrealloc(list, (*list_sz * sizeof(double)));
 			lp = list;
 			lp += n - 1;
 		}
@@ -127,6 +108,47 @@ int main(int argc, char **argv)
 	range = q3 - q1;
 	printf("lof: %f q1: %f m: %f q3: %f hof: %f (range: %f)\n", q1 - range,
 	       q1, mean, q3, q3 + range, range);
+	return 0;
+}
+
+int main(int argc, char **argv)
+{
+	double *list;
+	int c;
+	size_t list_sz = 0x8000;
+	static const struct option longopts[] = {
+		{"version", no_argument, NULL, 'V'},
+		{"help", no_argument, NULL, 'h'},
+		{NULL, 0, NULL, 0}
+	};
+
+	while ((c = getopt_long(argc, argv, "Vh", longopts, NULL)) != -1) {
+		switch (c) {
+		case 'V':
+			printf("%s version %s\n", PACKAGE_NAME,
+			       PACKAGE_VERSION);
+			return EXIT_SUCCESS;
+		case 'h':
+			usage(stdout);
+		default:
+			usage(stderr);
+		}
+	}
+	list = xmalloc(list_sz * sizeof(double));
+	if (argc == 1)
+		process_file(stdin, list, &list_sz);
+	else {
+		FILE *fd;
+		int i;
+
+		for (i = 1; i < argc; i++) {
+			fd = fopen(argv[i], "r");
+			if (!fd)
+				err(EXIT_FAILURE, "%s", argv[i]);
+			printf("%s: ", argv[i]);
+			process_file(stdin, list, &list_sz);
+		}
+	}
 	free(list);
 	return 0;
 }

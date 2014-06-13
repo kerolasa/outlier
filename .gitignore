@@ -18,5 +18,5 @@
 /Makefile
 /Makefile.in
 /outlier
-/outlier-outlier.o
+/outlier.o
 /stamp-h1
