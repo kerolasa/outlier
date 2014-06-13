@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-int comp_double(const void *a, const void *b)
+static int __attribute__((__pure__)) comp_double(const void *a, const void *b)
 {
 	double f1 = *(double *)a;
 	double f2 = *(double *)b;
