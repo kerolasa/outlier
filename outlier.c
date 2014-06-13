@@ -35,9 +35,24 @@
  */
 
 #include <err.h>
+#include <errno.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
+
+static void __attribute__((__noreturn__)) usage(FILE *out)
+{
+	fputs("\nUsage:\n", out);
+	fprintf(out, " %s [options] file.rrd <file.rrd ...>\n", program_invocation_short_name);
+	fputs("\nOptions:\n", out);
+	fputs(" -h, --help           display this help and exit\n", out);
+	fputs(" -V, --version        output version information and exit\n", out);
+	fputs("\n", out);
+	fprintf(out, "For more details see %s(1).\n", PACKAGE_NAME);
+	exit(out == stderr ? EXIT_FAILURE : EXIT_SUCCESS);
+}
 
 static void *xmalloc(const size_t size)
 {
@@ -65,11 +80,29 @@ static int __attribute__((__pure__)) comp_double(const void *a, const void *b)
 	return f1 < f2 ? -1 : f1 > f2 ? 1 : 0;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
 	double *list, *lp, d, mean, q1, q3, range;
-	int matches;
+	int matches, c;
 	size_t n = 0, list_sz = 0x8000;
+
+	static const struct option longopts[] = {
+		{"version", no_argument, NULL, 'V'},
+		{"help", no_argument, NULL, 'h'},
+		{NULL, 0, NULL, 0}
+	};
+
+	while ((c = getopt_long(argc, argv, "Vh", longopts, NULL)) != -1) {
+		switch (c) {
+		case 'V':
+			printf("%s version %s", PACKAGE_NAME, PACKAGE_VERSION);
+			return EXIT_SUCCESS;
+		case 'h':
+			usage(stdout);
+		default:
+			usage(stderr);
+		}
+	}
 
 	list = xmalloc(list_sz * sizeof(double));
 	lp = list;
