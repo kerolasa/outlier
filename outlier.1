@@ -1,0 +1,54 @@
+.TH OUTLIER "1" "2014-06-14" "outlier" "User Commands"
+.SH NAME
+outlier \- find outlier limits from numeric input
+.SH SYNOPSIS
+.B outlier
+[options]
+.I [file]
+.SH DESCRIPTION
+This command reads from input files, or stdin when file argument is
+omitted, numeric input and does statistics analysis to the values.
+Output put has is printed to each input file separately, and it contains
+.I lof
+(low fench),
+.I q1
+(first quartile),
+.IR mean ,
+.I q1
+(third quartile),
+.I hof
+(high fench), and
+.IR range .
+The output is same as what is basis of a traditional boxplot.
+.SH OPTIONS
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Display version information and exit.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Display help and exit.
+.SH EXAMPLE
+Dump rrd a file, filter output to contain only measurement values, and
+analyze.
+.PP
+.nf
+rrdtool dump file.rrd |
+  xmllint --xpath /rrd/rra/database/row/v |
+  sed 's/<v>//g; s/<\/v>/\n/g' |
+  outlier
+.fi
+.SH NOTES
+This command was originally wrote to assist finding reasonable alarming
+thresholds from rrd files.  The
+.I lof
+and
+.I hof
+can be considered as a reasonable guess when a measurement exceeds limit
+of begin normal, and an alarm should be sent.
+.SH "SEE ALSO"
+.BR rrdtool (1)
+.SH AVAILABILITY
+The outlier command can be found from
+.UR https://github.com/kerolasa/outlier/
+github
+.UE .
