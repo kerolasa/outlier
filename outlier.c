@@ -34,21 +34,35 @@
  * official policies, either expressed or implied, of Sami Kerola.
  */
 
+#include <assert.h>
 #include <err.h>
 #include <errno.h>
 #include <getopt.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
+#include <libxml/xpath.h>
+#include <libxml/xpathInternals.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include <math.h>
 
 #define DEFAULT_MULTIPLIER 1.5
+
+struct outlier_conf {
+	double whiskers;
+	double *list;
+	size_t list_sz;
+	unsigned int rrdxml:1;
+};
 
 static void __attribute__((__noreturn__)) usage(FILE *out)
 {
 	fputs("\nUsage:\n", out);
-	fprintf(out, " %s [options] file.rrd <file.rrd ...>\n", program_invocation_short_name);
+	fprintf(out, " %s [options] <file ...>\n", program_invocation_short_name);
 	fputs("\nOptions:\n", out);
+	fputs(" -r, --rrdxml         input is rrdtool --dump output\n", out);
 	fputs(" -w, --whiskers <num> interquartile range multiplier\n", out);
 	fputs(" -h, --help           display this help and exit\n", out);
 	fputs(" -V, --version        output version information and exit\n", out);
@@ -98,32 +112,122 @@ static int __attribute__((__pure__)) comp_double(const void *a, const void *b)
 	return *(double *)a < *(double *)b ? -1 : *(double *)a > *(double *)b ? 1 : 0;
 }
 
-static int process_file(FILE *fd, double *list, size_t *list_sz, double whiskers)
+static size_t collect_data(xmlNodeSetPtr nodes, FILE *output,
+			   struct outlier_conf *conf)
 {
-	double *lp, d, mean, q1, q3, range;
+	xmlNodePtr cur;
+	char *value;
+	int i, size;
+	double *lp, d;
 	size_t n = 0;
 	int matches;
 
-	lp = list;
+	assert(output);
+	size = (nodes) ? nodes->nodeNr : 0;
+	lp = conf->list;
+	for (i = 0; i < size; ++i) {
+		assert(nodes->nodeTab[i]);
+		if (nodes->nodeTab[i]->type == XML_ELEMENT_NODE) {
+			cur = nodes->nodeTab[i];
+			value = (char *)xmlNodeGetContent(cur);
+			matches = sscanf(value, "%le", &d);
+			if (matches == 0 || isnan(d))
+				continue;
+			*lp = d;
+			n++;
+			if (conf->list_sz < n) {
+				conf->list_sz *= 2;
+				conf->list =
+				    xrealloc(conf->list,
+					     (conf->list_sz * sizeof(double)));
+				lp = conf->list;
+				lp += n - 1;
+			}
+			lp++;
+		}
+	}
+	return n;
+}
+
+static size_t execute_xpath_expression(const char *filename,
+				       const xmlChar *xpathExpr,
+				       struct outlier_conf *conf)
+{
+	xmlDocPtr doc;
+	xmlXPathContextPtr xpathCtx;
+	xmlXPathObjectPtr xpathObj;
+	size_t ret;
+
+	if (!(doc = xmlParseFile(filename)))
+		errx(EXIT_FAILURE, "unable to parse file: %s", filename);
+	if (!(xpathCtx = xmlXPathNewContext(doc)))
+		errx(EXIT_FAILURE, "unable to create new XPath context");
+	if (!(xpathObj = xmlXPathEvalExpression(xpathExpr, xpathCtx)))
+		errx(EXIT_FAILURE, "unable to evaluate xpath expression: %s", xpathExpr);
+	ret = collect_data(xpathObj->nodesetval, stdout, conf);
+	xmlXPathFreeObject(xpathObj);
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+	return ret;
+}
+
+static size_t read_rrdxml(char *file, struct outlier_conf *conf)
+{
+	size_t ret;
+
+	xmlInitParser();
+	LIBXML_TEST_VERSION;
+	ret = execute_xpath_expression(file, BAD_CAST "/rrd/rra/database/row/v", conf);
+	xmlCleanupParser();
+	return ret;
+}
+
+static size_t read_digits(char *file, struct outlier_conf *conf)
+{
+	FILE *fd;
+	double *lp, d;
+	size_t n = 0;
+	int matches;
+
+	fd = fopen(file, "r");
+	if (!fd)
+		err(EXIT_FAILURE, "%s", file);
+	lp = conf->list;
 	while (!feof(fd)) {
-		matches = scanf("%le", &d);
+		matches = fscanf(fd, "%le", &d);
 		if (matches == 0 || isnan(d))
 			continue;
 		*lp = d;
 		n++;
-		if (*list_sz < n) {
-			*list_sz *= 2;
-			list = xrealloc(list, (*list_sz * sizeof(double)));
-			lp = list;
+		if (conf->list_sz < n) {
+			conf->list_sz *= 2;
+			conf->list =
+			    xrealloc(conf->list,
+				     (conf->list_sz * sizeof(double)));
+			lp = conf->list;
 			lp += n - 1;
 		}
 		lp++;
 	}
-	qsort(list, n, sizeof(double), &comp_double);
-	q1 = list[n / 4];
-	mean = list[n / 2];
-	q3 = list[(n / 4) * 3];
-	range = (q3 - q1) * whiskers;
+	return n;
+}
+
+static int process_file(char *file, struct outlier_conf *conf)
+{
+	double mean, q1, q3, range;
+	size_t n;
+
+	if (conf->rrdxml)
+		n = read_rrdxml(file, conf);
+	else
+		n = read_digits(file, conf);
+	if (n < 1)
+		return 1;
+	qsort(conf->list, n, sizeof(double), &comp_double);
+	q1 = conf->list[n / 4];
+	mean = conf->list[n / 2];
+	q3 = conf->list[(n / 4) * 3];
+	range = (q3 - q1) * conf->whiskers;
 	printf("lof: %f q1: %f m: %f q3: %f hof: %f (range: %f)\n", q1 - range,
 	       q1, mean, q3, q3 + range, range);
 	return 0;
@@ -131,20 +235,26 @@ static int process_file(FILE *fd, double *list, size_t *list_sz, double whiskers
 
 int main(int argc, char **argv)
 {
-	double *list, whiskers = DEFAULT_MULTIPLIER;
-	int c;
-	size_t list_sz = 0x8000;
+	struct outlier_conf conf;
+	int c, ret = 0;
 	static const struct option longopts[] = {
+		{"rrdxml", no_argument, NULL, 'r'},
 		{"whiskers", required_argument, NULL, 'w'},
 		{"version", no_argument, NULL, 'V'},
 		{"help", no_argument, NULL, 'h'},
 		{NULL, 0, NULL, 0}
 	};
 
-	while ((c = getopt_long(argc, argv, "w:Vh", longopts, NULL)) != -1) {
+	conf.whiskers = DEFAULT_MULTIPLIER;
+	conf.list_sz = 0x8000;
+	conf.rrdxml = 0;
+	while ((c = getopt_long(argc, argv, "rw:Vh", longopts, NULL)) != -1) {
 		switch (c) {
+		case 'r':
+			conf.rrdxml = 1;
+			break;
 		case 'w':
-			whiskers = xstrtod(optarg, "failed to parse multiplier");
+			conf.whiskers = xstrtod(optarg, "failed to parse multiplier");
 			break;
 		case 'V':
 			printf("%s version %s\n", PACKAGE_NAME,
@@ -156,21 +266,17 @@ int main(int argc, char **argv)
 			usage(stderr);
 		}
 	}
-	list = xmalloc(list_sz * sizeof(double));
+	conf.list = xmalloc(conf.list_sz * sizeof(double));
 	if (argc == optind)
-		process_file(stdin, list, &list_sz, whiskers);
+		ret = process_file("/dev/stdin", &conf);
 	else {
-		FILE *fd;
 		int i;
 
 		for (i = optind; i < argc; i++) {
-			fd = fopen(argv[i], "r");
-			if (!fd)
-				err(EXIT_FAILURE, "%s", argv[i]);
 			printf("%s: ", argv[i]);
-			process_file(stdin, list, &list_sz, whiskers);
+			ret |= process_file(argv[i], &conf);
 		}
 	}
-	free(list);
-	return 0;
+	free(conf.list);
+	return ret;
 }
