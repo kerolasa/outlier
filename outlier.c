@@ -42,11 +42,14 @@
 #include <unistd.h>
 #include <math.h>
 
+#define DEFAULT_MULTIPLIER 1.5
+
 static void __attribute__((__noreturn__)) usage(FILE *out)
 {
 	fputs("\nUsage:\n", out);
 	fprintf(out, " %s [options] file.rrd <file.rrd ...>\n", program_invocation_short_name);
 	fputs("\nOptions:\n", out);
+	fputs(" -w, --whiskers <num> interquartile range multiplier\n", out);
 	fputs(" -h, --help           display this help and exit\n", out);
 	fputs(" -V, --version        output version information and exit\n", out);
 	fputs("\n", out);
@@ -72,12 +75,30 @@ static void *xrealloc(void *ptr, const size_t size)
 	return ret;
 }
 
+static double xstrtod(const char *str, const char *errmesg)
+{
+	double num;
+	char *end = NULL;
+
+	if (str == NULL || *str == '\0')
+		goto err;
+	errno = 0;
+	num = strtod(str, &end);
+	if (errno || str == end || (end && *end))
+		goto err;
+	return num;
+ err:
+	if (errno)
+		err(EXIT_FAILURE, "%s: '%s'", errmesg, str);
+	errx(EXIT_FAILURE, "%s: '%s'", errmesg, str);
+}
+
 static int __attribute__((__pure__)) comp_double(const void *a, const void *b)
 {
 	return *(double *)a < *(double *)b ? -1 : *(double *)a > *(double *)b ? 1 : 0;
 }
 
-static int process_file(FILE *fd, double *list, size_t *list_sz)
+static int process_file(FILE *fd, double *list, size_t *list_sz, double whiskers)
 {
 	double *lp, d, mean, q1, q3, range;
 	size_t n = 0;
@@ -102,7 +123,7 @@ static int process_file(FILE *fd, double *list, size_t *list_sz)
 	q1 = list[n / 4];
 	mean = list[n / 2];
 	q3 = list[(n / 4) * 3];
-	range = q3 - q1;
+	range = (q3 - q1) * whiskers;
 	printf("lof: %f q1: %f m: %f q3: %f hof: %f (range: %f)\n", q1 - range,
 	       q1, mean, q3, q3 + range, range);
 	return 0;
@@ -110,17 +131,21 @@ static int process_file(FILE *fd, double *list, size_t *list_sz)
 
 int main(int argc, char **argv)
 {
-	double *list;
+	double *list, whiskers = DEFAULT_MULTIPLIER;
 	int c;
 	size_t list_sz = 0x8000;
 	static const struct option longopts[] = {
+		{"whiskers", required_argument, NULL, 'w'},
 		{"version", no_argument, NULL, 'V'},
 		{"help", no_argument, NULL, 'h'},
 		{NULL, 0, NULL, 0}
 	};
 
-	while ((c = getopt_long(argc, argv, "Vh", longopts, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "w:Vh", longopts, NULL)) != -1) {
 		switch (c) {
+		case 'w':
+			whiskers = xstrtod(optarg, "failed to parse multiplier");
+			break;
 		case 'V':
 			printf("%s version %s\n", PACKAGE_NAME,
 			       PACKAGE_VERSION);
@@ -132,18 +157,18 @@ int main(int argc, char **argv)
 		}
 	}
 	list = xmalloc(list_sz * sizeof(double));
-	if (argc == 1)
-		process_file(stdin, list, &list_sz);
+	if (argc == optind)
+		process_file(stdin, list, &list_sz, whiskers);
 	else {
 		FILE *fd;
 		int i;
 
-		for (i = 1; i < argc; i++) {
+		for (i = optind; i < argc; i++) {
 			fd = fopen(argv[i], "r");
 			if (!fd)
 				err(EXIT_FAILURE, "%s", argv[i]);
 			printf("%s: ", argv[i]);
-			process_file(stdin, list, &list_sz);
+			process_file(stdin, list, &list_sz, whiskers);
 		}
 	}
 	free(list);

@@ -22,6 +22,18 @@ Output put has is printed to each input file separately, and it contains
 The output is same as what is basis of a traditional boxplot.
 .SH OPTIONS
 .TP
+\fB\-w\fR, \fB\-\-whiskers\fR \fImultiplier\fR
+Multiply interquartile range by a floating point number, to set
+.I lof
+and
+.I hof
+to be closer
+.RI ( multiplier
+< 1.0) or further
+.RI "(1.0 < " multplier ).
+The default multiplier is
+.BR 1.5 .
+.TP
 \fB\-V\fR, \fB\-\-version\fR
 Display version information and exit.
 .TP
@@ -46,7 +58,9 @@ and
 can be considered as a reasonable guess when a measurement exceeds limit
 of begin normal, and an alarm should be sent.
 .SH "SEE ALSO"
-.BR rrdtool (1)
+.BR rrdtool (1) ,
+.UR http://en.wikipedia.org/wiki/Box_plot
+.UE
 .SH AVAILABILITY
 The outlier command can be found from
 .UR https://github.com/kerolasa/outlier/
