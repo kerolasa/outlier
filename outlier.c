@@ -74,10 +74,7 @@ static void *xrealloc(void *ptr, const size_t size)
 
 static int __attribute__((__pure__)) comp_double(const void *a, const void *b)
 {
-	double f1 = *(double *)a;
-	double f2 = *(double *)b;
-
-	return f1 < f2 ? -1 : f1 > f2 ? 1 : 0;
+	return *(double *)a < *(double *)b ? -1 : *(double *)a > *(double *)b ? 1 : 0;
 }
 
 static int process_file(FILE *fd, double *list, size_t *list_sz)
