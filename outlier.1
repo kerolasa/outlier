@@ -16,7 +16,7 @@ Output put has is printed to each input file separately, and it contains
 .IR mean ,
 .I q1
 (third quartile),
-.I hof
+.I hif
 (high fench), and
 .IR range .
 The output is same as what is basis of a traditional boxplot.
@@ -31,7 +31,7 @@ xml output.
 Multiply interquartile range by a floating point number, to set
 .I lof
 and
-.I hof
+.I hif
 to be closer
 .RI ( multiplier
 < 1.0) or further
@@ -59,7 +59,7 @@ This command was originally wrote to assist finding reasonable alarming
 thresholds from rrd files.  The
 .I lof
 and
-.I hof
+.I hif
 can be considered as a reasonable guess when a measurement exceeds limit
 of begin normal, and an alarm should be sent.
 .SH "SEE ALSO"

@@ -5,13 +5,13 @@ $ rrdtool dump file.rrd |
 > xmllint --xpath /rrd/rra/database/row/v |
 > sed 's/<v>//g; s/<\/v>/\n/g' |
 > outlier
-lof: -105.000000 q1: 155.000000 m: 305.000000 q3: 415.000000 hof: 675.000000 (range: 260.000000)
+lof: -105.000000 q1: 155.000000 m: 305.000000 q3: 415.000000 hif: 675.000000 (range: 260.000000)
 
 lof   = low fench (q1 - range)
 q1    = first quartile
 m     = mean
 q3    = third quartile
-hof   = high fench (q3 + range)
+hif   = high fench (q3 + range)
 range = q3 - q1
 
 The numbers above are just a random sample data.

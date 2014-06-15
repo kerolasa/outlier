@@ -228,7 +228,7 @@ static int process_file(char *file, struct outlier_conf *conf)
 	mean = conf->list[n / 2];
 	q3 = conf->list[(n / 4) * 3];
 	range = (q3 - q1) * conf->whiskers;
-	printf("lof: %f q1: %f m: %f q3: %f hof: %f (range: %f)\n", q1 - range,
+	printf("lof: %f q1: %f m: %f q3: %f hif: %f (range: %f)\n", q1 - range,
 	       q1, mean, q3, q3 + range, range);
 	return 0;
 }
