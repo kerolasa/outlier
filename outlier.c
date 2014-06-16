@@ -49,6 +49,7 @@
 #include <unistd.h>
 
 #define DEFAULT_MULTIPLIER 1.5
+#define RRD_DATA "/rrd/rra/database/row/v"
 
 struct outlier_conf {
 	double whiskers;
@@ -112,8 +113,7 @@ static int __attribute__((__pure__)) comp_double(const void *a, const void *b)
 	return *(double *)a < *(double *)b ? -1 : *(double *)a > *(double *)b ? 1 : 0;
 }
 
-static size_t collect_data(xmlNodeSetPtr nodes, FILE *output,
-			   struct outlier_conf *conf)
+static size_t collect_data(xmlNodeSetPtr nodes, struct outlier_conf *conf)
 {
 	xmlNodePtr cur;
 	char *value;
@@ -122,7 +122,6 @@ static size_t collect_data(xmlNodeSetPtr nodes, FILE *output,
 	size_t n = 0;
 	int matches;
 
-	assert(output);
 	size = (nodes) ? nodes->nodeNr : 0;
 	lp = conf->list;
 	for (i = 0; i < size; ++i) {
@@ -149,9 +148,7 @@ static size_t collect_data(xmlNodeSetPtr nodes, FILE *output,
 	return n;
 }
 
-static size_t execute_xpath_expression(const char *filename,
-				       const xmlChar *xpathExpr,
-				       struct outlier_conf *conf)
+static size_t execute_xpath_expression(const char *filename, struct outlier_conf *conf)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr xpathCtx;
@@ -162,9 +159,9 @@ static size_t execute_xpath_expression(const char *filename,
 		errx(EXIT_FAILURE, "unable to parse file: %s", filename);
 	if (!(xpathCtx = xmlXPathNewContext(doc)))
 		errx(EXIT_FAILURE, "unable to create new XPath context");
-	if (!(xpathObj = xmlXPathEvalExpression(xpathExpr, xpathCtx)))
-		errx(EXIT_FAILURE, "unable to evaluate xpath expression: %s", xpathExpr);
-	ret = collect_data(xpathObj->nodesetval, stdout, conf);
+	if (!(xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_DATA, xpathCtx)))
+		errx(EXIT_FAILURE, "unable to evaluate xpath expression: %s", RRD_DATA);
+	ret = collect_data(xpathObj->nodesetval, conf);
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	xmlFreeDoc(doc);
@@ -177,7 +174,7 @@ static size_t read_rrdxml(char *file, struct outlier_conf *conf)
 
 	xmlInitParser();
 	LIBXML_TEST_VERSION;
-	ret = execute_xpath_expression(file, BAD_CAST "/rrd/rra/database/row/v", conf);
+	ret = execute_xpath_expression(file, conf);
 	xmlCleanupParser();
 	return ret;
 }
@@ -244,10 +241,9 @@ int main(int argc, char **argv)
 		{"help", no_argument, NULL, 'h'},
 		{NULL, 0, NULL, 0}
 	};
-
+	memset(&conf, 0, sizeof(conf));
 	conf.whiskers = DEFAULT_MULTIPLIER;
 	conf.list_sz = 0x8000;
-	conf.rrdxml = 0;
 	while ((c = getopt_long(argc, argv, "rw:Vh", longopts, NULL)) != -1) {
 		switch (c) {
 		case 'r':
