@@ -5,4 +5,4 @@ outlier_SOURCES = outlier.c
 outlier_CFLAGS = $(LIBXML2_CFLAGS)
 outlier_LDADD = $(LIBXML2_LIBS)
 
-man_MANS = outlier.1
+dist_man_MANS = outlier.1
