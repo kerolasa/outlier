@@ -65,10 +65,9 @@ Dump rrd a file, filter output to contain only measurement values, and
 analyze.
 .PP
 .nf
-rrdtool dump file.rrd |
-  xmllint --xpath /rrd/rra/database/row/v |
-  sed 's/<v>//g; s/<\/v>/\n/g' |
-  outlier
+rrdtool dump file.rrd | outlier --rrdxml
+cat lots_of_numbers | outlier
+outlier input_file_1 input_file_2
 .fi
 .SH NOTES
 This command was originally wrote to assist finding reasonable alarming

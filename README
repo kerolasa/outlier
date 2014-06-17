@@ -1,10 +1,12 @@
 An utility to find low and high fenches from rrd information that can be
 used in monitoring as lower and upper limits for alarming.
 
-$ rrdtool dump file.rrd |
-> xmllint --xpath /rrd/rra/database/row/v |
-> sed 's/<v>//g; s/<\/v>/\n/g' |
-> outlier
+$ echo "71 70 73 70 70 69 70 72 71 300 71 69" |
+> outlier -w 3
+lof: 65.500000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 76.000000 (range: 4.500000)
+
+$ rrdtool dump sample.rrd |
+> outlier --rrdxml
 lof: -105.000000 q1: 155.000000 m: 305.000000 q3: 415.000000 hif: 675.000000 (range: 260.000000)
 
 lof   = low fench (q1 - range)
