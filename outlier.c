@@ -237,6 +237,20 @@ static size_t read_digits(char *file, struct outlier_conf *conf)
 	return n;
 }
 
+static double find_mean(size_t n, double *list)
+{
+	if (n / 2 == 1)
+		return list[n / 2];
+	return ((list[n / 2] + list[(n / 2) + 1]) / 2);
+}
+
+static double find_quartile(size_t n, int q, double *list)
+{
+	if (n / 2 == 1)
+		return list[(n / 4) * q];
+	return (((list[(n / 4) * q]) + (list[((n / 4) * q) + 1])) / 2);
+}
+
 static int process_file(char *file, struct outlier_conf *conf)
 {
 	double mean, q1, q3, range, lof, hif;
@@ -249,9 +263,9 @@ static int process_file(char *file, struct outlier_conf *conf)
 	if (n < 1)
 		return 1;
 	qsort(conf->list, n, sizeof(double), &comp_double);
-	q1 = conf->list[n / 4];
-	mean = conf->list[n / 2];
-	q3 = conf->list[(n / 4) * 3];
+	q1 = find_quartile(n, 1, conf->list);
+	mean = find_mean(n, conf->list);
+	q3 = find_quartile(n, 3, conf->list);
 	range = (q3 - q1) * conf->whiskers;
 	if (conf->min_set && q1 - range < conf->min)
 		lof = conf->min;
