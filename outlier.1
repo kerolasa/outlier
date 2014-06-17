@@ -22,6 +22,16 @@ Output put has is printed to each input file separately, and it contains
 The output is same as what is basis of a traditional boxplot.
 .SH OPTIONS
 .TP
+\fB\-m\fR, \fB\-\-min\fR \fIvalue\fR
+Minimum allowed value.  When
+.I lof
+is calculated to be smaller the minimum value is printed instead.
+.TP
+\fB\-x\fR, \fB\-\-max\fR \fIvalue\fR
+Maximum allowed value.  When
+.I hif
+is calculated to be greater the maximum value is printed instead.
+.TP
 \fB\-r\fR, \fB\-\-rrdxml\fR
 Read rrd archive database row values from
 .B rrdtool dump

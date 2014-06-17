@@ -67,6 +67,8 @@ static void __attribute__((__noreturn__)) usage(FILE *out)
 	fputs("\nUsage:\n", out);
 	fprintf(out, " %s [options] <file ...>\n", program_invocation_short_name);
 	fputs("\nOptions:\n", out);
+	fputs(" -m, --min <num>      minimum value for printout range\n", out);
+	fputs(" -x, --max <num>      maximum value for printout range\n", out);
 	fputs(" -r, --rrdxml         input is rrdtool --dump output\n", out);
 	fputs(" -w, --whiskers <num> interquartile range multiplier\n", out);
 	fputs(" -h, --help           display this help and exit\n", out);
@@ -124,7 +126,7 @@ static void find_min_max(xmlXPathContextPtr xpathCtx, struct outlier_conf *conf)
 	double d;
 	int matches;
 
-	if ((xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_MIN, xpathCtx))) {
+	if ((xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_MIN, xpathCtx)) && !conf->min_set) {
 		value = (char *)xmlNodeGetContent(xpathObj->nodesetval->nodeTab[0]);
 		matches = sscanf(value, "%le", &d);
 		if (matches != 0 && !isnan(d)) {
@@ -132,7 +134,7 @@ static void find_min_max(xmlXPathContextPtr xpathCtx, struct outlier_conf *conf)
 			conf->min_set = 1;
 		}
 	}
-	if ((xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_MAX, xpathCtx))) {
+	if ((xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_MAX, xpathCtx)) && !conf->max_set) {
 		value = (char *)xmlNodeGetContent(xpathObj->nodesetval->nodeTab[0]);
 		matches = sscanf(value, "%le", &d);
 		if (matches != 0 && !isnan(d)) {
@@ -268,6 +270,8 @@ int main(int argc, char **argv)
 	struct outlier_conf conf;
 	int c, ret = 0;
 	static const struct option longopts[] = {
+		{"min", required_argument, NULL, 'm'},
+		{"max", required_argument, NULL, 'x'},
 		{"rrdxml", no_argument, NULL, 'r'},
 		{"whiskers", required_argument, NULL, 'w'},
 		{"version", no_argument, NULL, 'V'},
@@ -277,8 +281,16 @@ int main(int argc, char **argv)
 	memset(&conf, 0, sizeof(conf));
 	conf.whiskers = DEFAULT_MULTIPLIER;
 	conf.list_sz = 0x8000;
-	while ((c = getopt_long(argc, argv, "rw:Vh", longopts, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "mxrw:Vh", longopts, NULL)) != -1) {
 		switch (c) {
+		case 'm':
+			conf.min = xstrtod(optarg, "failed to parse min");
+			conf.min_set = 1;
+			break;
+		case 'x':
+			conf.max = xstrtod(optarg, "failed to parse max");
+			conf.max_set = 1;
+			break;
 		case 'r':
 			conf.rrdxml = 1;
 			break;
