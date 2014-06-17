@@ -50,12 +50,16 @@
 
 #define DEFAULT_MULTIPLIER 1.5
 #define RRD_DATA "/rrd/rra/database/row/v"
+#define RRD_MIN "/rrd/ds/min"
+#define RRD_MAX "/rrd/ds/max"
 
 struct outlier_conf {
 	double whiskers;
 	double *list;
 	size_t list_sz;
-	unsigned int rrdxml:1;
+	double min;
+	double max;
+	unsigned int rrdxml:1, min_set:1, max_set:1;
 };
 
 static void __attribute__((__noreturn__)) usage(FILE *out)
@@ -113,6 +117,35 @@ static int __attribute__((__pure__)) comp_double(const void *a, const void *b)
 	return *(double *)a < *(double *)b ? -1 : *(double *)a > *(double *)b ? 1 : 0;
 }
 
+static void find_min_max(xmlXPathContextPtr xpathCtx,
+			   struct outlier_conf *conf)
+{
+	xmlXPathObjectPtr xpathObj;
+	char *value;
+	double d;
+	int matches;
+
+	if ((xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_MIN, xpathCtx))) {
+		value =
+		    (char *)xmlNodeGetContent(xpathObj->nodesetval->nodeTab[0]);
+		matches = sscanf(value, "%le", &d);
+		if (matches != 0 && !isnan(d)) {
+			conf->min = d;
+			conf->min_set = 1;
+		}
+	}
+	if ((xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_MAX, xpathCtx))) {
+		value =
+		    (char *)xmlNodeGetContent(xpathObj->nodesetval->nodeTab[0]);
+		matches = sscanf(value, "%le", &d);
+		if (matches != 0 && !isnan(d)) {
+			conf->max = d;
+			conf->max_set = 1;
+		}
+	}
+}
+
+
 static size_t collect_data(xmlNodeSetPtr nodes, struct outlier_conf *conf)
 {
 	xmlNodePtr cur;
@@ -159,6 +192,7 @@ static size_t execute_xpath_expression(const char *filename, struct outlier_conf
 		errx(EXIT_FAILURE, "unable to parse file: %s", filename);
 	if (!(xpathCtx = xmlXPathNewContext(doc)))
 		errx(EXIT_FAILURE, "unable to create new XPath context");
+	find_min_max(xpathCtx, conf);
 	if (!(xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_DATA, xpathCtx)))
 		errx(EXIT_FAILURE, "unable to evaluate xpath expression: %s", RRD_DATA);
 	ret = collect_data(xpathObj->nodesetval, conf);
@@ -211,7 +245,7 @@ static size_t read_digits(char *file, struct outlier_conf *conf)
 
 static int process_file(char *file, struct outlier_conf *conf)
 {
-	double mean, q1, q3, range;
+	double mean, q1, q3, range, lof, hif;
 	size_t n;
 
 	if (conf->rrdxml)
@@ -225,8 +259,16 @@ static int process_file(char *file, struct outlier_conf *conf)
 	mean = conf->list[n / 2];
 	q3 = conf->list[(n / 4) * 3];
 	range = (q3 - q1) * conf->whiskers;
-	printf("lof: %f q1: %f m: %f q3: %f hif: %f (range: %f)\n", q1 - range,
-	       q1, mean, q3, q3 + range, range);
+	if (conf->min_set && q1 - range < conf->min)
+		lof = conf->min;
+	else
+		lof = q1 - range;
+	if (conf->max_set && conf->max < q3 + range)
+		hif = conf->max;
+	else
+		hif = q3 + range;
+	printf("lof: %f q1: %f m: %f q3: %f hif: %f (range: %f)\n", lof, q1,
+	       mean, q3, hif, range);
 	return 0;
 }
 
