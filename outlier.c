@@ -117,8 +117,7 @@ static int __attribute__((__pure__)) comp_double(const void *a, const void *b)
 	return *(double *)a < *(double *)b ? -1 : *(double *)a > *(double *)b ? 1 : 0;
 }
 
-static void find_min_max(xmlXPathContextPtr xpathCtx,
-			   struct outlier_conf *conf)
+static void find_min_max(xmlXPathContextPtr xpathCtx, struct outlier_conf *conf)
 {
 	xmlXPathObjectPtr xpathObj;
 	char *value;
@@ -126,8 +125,7 @@ static void find_min_max(xmlXPathContextPtr xpathCtx,
 	int matches;
 
 	if ((xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_MIN, xpathCtx))) {
-		value =
-		    (char *)xmlNodeGetContent(xpathObj->nodesetval->nodeTab[0]);
+		value = (char *)xmlNodeGetContent(xpathObj->nodesetval->nodeTab[0]);
 		matches = sscanf(value, "%le", &d);
 		if (matches != 0 && !isnan(d)) {
 			conf->min = d;
@@ -135,8 +133,7 @@ static void find_min_max(xmlXPathContextPtr xpathCtx,
 		}
 	}
 	if ((xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_MAX, xpathCtx))) {
-		value =
-		    (char *)xmlNodeGetContent(xpathObj->nodesetval->nodeTab[0]);
+		value = (char *)xmlNodeGetContent(xpathObj->nodesetval->nodeTab[0]);
 		matches = sscanf(value, "%le", &d);
 		if (matches != 0 && !isnan(d)) {
 			conf->max = d;
@@ -144,7 +141,6 @@ static void find_min_max(xmlXPathContextPtr xpathCtx,
 		}
 	}
 }
-
 
 static size_t collect_data(xmlNodeSetPtr nodes, struct outlier_conf *conf)
 {
@@ -169,9 +165,7 @@ static size_t collect_data(xmlNodeSetPtr nodes, struct outlier_conf *conf)
 			n++;
 			if (conf->list_sz < n) {
 				conf->list_sz *= 2;
-				conf->list =
-				    xrealloc(conf->list,
-					     (conf->list_sz * sizeof(double)));
+				conf->list = xrealloc(conf->list, (conf->list_sz * sizeof(double)));
 				lp = conf->list;
 				lp += n - 1;
 			}
@@ -232,9 +226,7 @@ static size_t read_digits(char *file, struct outlier_conf *conf)
 		n++;
 		if (conf->list_sz < n) {
 			conf->list_sz *= 2;
-			conf->list =
-			    xrealloc(conf->list,
-				     (conf->list_sz * sizeof(double)));
+			conf->list = xrealloc(conf->list, (conf->list_sz * sizeof(double)));
 			lp = conf->list;
 			lp += n - 1;
 		}
@@ -267,8 +259,7 @@ static int process_file(char *file, struct outlier_conf *conf)
 		hif = conf->max;
 	else
 		hif = q3 + range;
-	printf("lof: %f q1: %f m: %f q3: %f hif: %f (range: %f)\n", lof, q1,
-	       mean, q3, hif, range);
+	printf("lof: %f q1: %f m: %f q3: %f hif: %f (range: %f)\n", lof, q1, mean, q3, hif, range);
 	return 0;
 }
 
@@ -295,8 +286,7 @@ int main(int argc, char **argv)
 			conf.whiskers = xstrtod(optarg, "failed to parse multiplier");
 			break;
 		case 'V':
-			printf("%s version %s\n", PACKAGE_NAME,
-			       PACKAGE_VERSION);
+			printf("%s version %s\n", PACKAGE_NAME, PACKAGE_VERSION);
 			return EXIT_SUCCESS;
 		case 'h':
 			usage(stdout);
