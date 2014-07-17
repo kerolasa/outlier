@@ -275,7 +275,8 @@ static int process_file(char *file, struct outlier_conf *conf)
 		hif = conf->max;
 	else
 		hif = q3 + range;
-	printf("lof: %f q1: %f m: %f q3: %f hif: %f (range: %f)\n", lof, q1, mean, q3, hif, range);
+	printf("lof: %f q1: %f m: %f q3: %f hif: %f (range: %f samples: %zu)\n",
+	       lof, q1, mean, q3, hif, range, n);
 	return 0;
 }
 
