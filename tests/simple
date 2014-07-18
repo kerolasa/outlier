@@ -1,0 +1,24 @@
+#!/bin/bash
+
+IAM="${0##*/}"
+
+if [ ! -d tests/outputs ]; then
+	mkdir tests/outputs
+fi
+
+>| tests/outputs/$IAM
+
+echo "one file test" >> tests/outputs/$IAM
+outlier tests/inputs/simple.dat >> tests/outputs/$IAM
+
+echo "two files test" >> tests/outputs/$IAM
+outlier tests/inputs/simple.dat tests/inputs/simple.dat >> tests/outputs/$IAM
+
+echo "stdin test" >> tests/outputs/$IAM
+tests/inputs/simple.dat | outlier >> tests/outputs/$IAM
+
+echo "horizontal numbers test" >> tests/outputs/$IAM
+outlier tests/inputs/horizontal.dat >> tests/outputs/$IAM
+
+diff -u $top_srcdir/tests/expected/$IAM tests/outputs/$IAM
+exit $?

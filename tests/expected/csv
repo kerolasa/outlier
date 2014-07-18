@@ -1,0 +1,10 @@
+one file test
+name,lof,q1,m,q3,hif,range,samples
+tests/inputs/simple.dat,67.750000,70.000000,70.500000,71.500000,73.750000,2.250000,13
+two files test
+name,lof,q1,m,q3,hif,range,samples
+tests/inputs/simple.dat,67.750000,70.000000,70.500000,71.500000,73.750000,2.250000,13
+tests/inputs/simple.dat,67.750000,70.000000,70.500000,71.500000,73.750000,2.250000,13
+stdin test
+lof,q1,m,q3,hif,range,samples
+0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,1
