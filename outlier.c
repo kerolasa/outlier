@@ -61,7 +61,12 @@ struct outlier_conf {
 	size_t list_sz;
 	double min;
 	double max;
-	unsigned int rrdxml:1, min_set:1, max_set:1, csv:1;
+	unsigned int
+		rrdxml:1,
+		min_set:1,
+		max_set:1,
+		csv:1,
+		yaml:1;
 };
 
 static void __attribute__((__noreturn__)) usage(FILE *out)
@@ -74,6 +79,7 @@ static void __attribute__((__noreturn__)) usage(FILE *out)
 	fputs(" -r, --rrdxml         input is rrdtool --dump output\n", out);
 	fputs(" -w, --whiskers <num> interquartile range multiplier\n", out);
 	fputs("     --csv            output comma separated values\n", out);
+	fputs("     --yaml           output yaml data\n", out);
 	fputs(" -h, --help           display this help and exit\n", out);
 	fputs(" -V, --version        output version information and exit\n", out);
 	fputs("\n", out);
@@ -281,6 +287,9 @@ static int process_file(char *file, struct outlier_conf *conf)
 	if (conf->csv)
 		printf("%f,%f,%f,%f,%f,%f,%zu\n",
 		       lof, q1, mean, q3, hif, range, n);
+	else if (conf->yaml)
+		printf("    lof: %f\n    q1: %f\n    m: %f\n    q3: %f\n    hif: %f\n    range: %f\n    samples: %zu\n",
+		       lof, q1, mean, q3, hif, range, n);
 	else
 		printf("lof: %f q1: %f m: %f q3: %f hif: %f (range: %f samples: %zu)\n",
 		       lof, q1, mean, q3, hif, range, n);
@@ -292,7 +301,8 @@ int main(int argc, char **argv)
 	struct outlier_conf conf;
 	int c, ret = 0;
 	enum {
-		CSV_OPT = CHAR_MAX + 1
+		CSV_OPT = CHAR_MAX + 1,
+		YAML_OPT
 	};
 	static const struct option longopts[] = {
 		{"min", required_argument, NULL, 'm'},
@@ -300,6 +310,7 @@ int main(int argc, char **argv)
 		{"rrdxml", no_argument, NULL, 'r'},
 		{"whiskers", required_argument, NULL, 'w'},
 		{"csv", no_argument, NULL, CSV_OPT},
+		{"yaml", no_argument, NULL, YAML_OPT},
 		{"version", no_argument, NULL, 'V'},
 		{"help", no_argument, NULL, 'h'},
 		{NULL, 0, NULL, 0}
@@ -326,6 +337,9 @@ int main(int argc, char **argv)
 		case CSV_OPT:
 			conf.csv = 1;
 			break;
+		case YAML_OPT:
+			conf.yaml = 1;
+			break;
 		case 'V':
 			printf("%s version %s\n", PACKAGE_NAME, PACKAGE_VERSION);
 			return EXIT_SUCCESS;
@@ -335,19 +349,27 @@ int main(int argc, char **argv)
 			usage(stderr);
 		}
 	}
+	if (conf.csv && conf.yaml)
+		errx(EXIT_FAILURE, "--csv and --yaml are mutually exclusive");
 	conf.list = xmalloc(conf.list_sz * sizeof(double));
 	if (argc == optind) {
 		if (conf.csv)
 			printf("lof,q1,m,q3,hif,range,samples\n");
+		else if (conf.yaml)
+			printf("---\noutlier:\n  stdin:\n");
 		ret = process_file("/dev/stdin", &conf);
 	} else {
 		int i;
 
 		if (conf.csv)
 			puts("name,lof,q1,m,q3,hif,range,samples");
+		else if (conf.yaml)
+			printf("---\noutlier:\n");
 		for (i = optind; i < argc; i++) {
 			if (conf.csv)
 				printf("%s,", argv[i]);
+			else if (conf.yaml)
+				printf("  %s:\n", argv[i]);
 			else
 				printf("%s: ", argv[i]);
 			ret |= process_file(argv[i], &conf);
