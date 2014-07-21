@@ -15,7 +15,7 @@ echo "two files test" >> tests/outputs/$IAM
 outlier tests/inputs/simple.dat tests/inputs/simple.dat >> tests/outputs/$IAM
 
 echo "stdin test" >> tests/outputs/$IAM
-tests/inputs/simple.dat | outlier >> tests/outputs/$IAM
+cat tests/inputs/simple.dat | outlier >> tests/outputs/$IAM
 
 echo "horizontal numbers test" >> tests/outputs/$IAM
 outlier tests/inputs/horizontal.dat >> tests/outputs/$IAM
