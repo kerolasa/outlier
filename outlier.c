@@ -269,7 +269,11 @@ static size_t read_digits(char *file, struct outlier_conf *conf)
 	lp = conf->list;
 	while (!feof(fd)) {
 		matches = fscanf(fd, "%le", &d);
-		if (matches == 0 || isnan(d))
+		if (matches == 0) {
+			fgetc(fd);
+			continue;
+		}
+		if (isnan(d))
 			continue;
 		*lp = d;
 		n++;
