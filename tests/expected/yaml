@@ -8,7 +8,7 @@ outlier:
     q3: 71.500000
     hif: 73.750000
     range: 2.250000
-    samples: 13
+    samples: 12
 two files test
 ---
 outlier:
@@ -19,7 +19,7 @@ outlier:
     q3: 71.500000
     hif: 73.750000
     range: 2.250000
-    samples: 13
+    samples: 12
   tests/inputs/simple.dat:
     lof: 67.750000
     q1: 70.000000
@@ -27,7 +27,7 @@ outlier:
     q3: 71.500000
     hif: 73.750000
     range: 2.250000
-    samples: 13
+    samples: 12
 stdin test
 ---
 outlier:
@@ -38,4 +38,4 @@ outlier:
     q3: 71.500000
     hif: 73.750000
     range: 2.250000
-    samples: 13
+    samples: 12

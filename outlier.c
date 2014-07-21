@@ -268,12 +268,13 @@ static size_t read_digits(char *file, struct outlier_conf *conf)
 		err(EXIT_FAILURE, "%s", file);
 	lp = conf->list;
 	while (!feof(fd)) {
+		errno = 0;
 		matches = fscanf(fd, "%le", &d);
 		if (matches == 0) {
 			fgetc(fd);
 			continue;
 		}
-		if (isnan(d))
+		if (isnan(d) || matches == EOF)
 			continue;
 		*lp = d;
 		n++;
@@ -290,16 +291,16 @@ static size_t read_digits(char *file, struct outlier_conf *conf)
 
 static double find_mean(size_t n, double *list)
 {
-	if (n / 2 == 1)
+	if (n % 2 == 1)
 		return list[n / 2];
-	return ((list[n / 2] + list[(n / 2) + 1]) / 2);
+	return ((list[(n / 2) - 1]  + list[n / 2]) / 2);
 }
 
 static double find_quartile(size_t n, int q, double *list)
 {
-	if (n / 2 == 1)
+	if (n % 2 == 1)
 		return list[(n / 4) * q];
-	return (((list[(n / 4) * q]) + (list[((n / 4) * q) + 1])) / 2);
+	return (((list[((n / 4) * q) - 1]) + (list[(n / 4) * q])) / 2);
 }
 
 static int process_file(char *file, struct outlier_conf *conf)
