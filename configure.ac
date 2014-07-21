@@ -26,6 +26,14 @@ AC_USE_SYSTEM_EXTENSIONS
 AC_C_RESTRICT
 AC_PROG_CC
 
+AC_CHECK_HEADERS([ \
+	stdio_ext.h \
+])
+
+AC_CHECK_FUNCS([ \
+	__fpending \
+])
+
 dnl Require pkg-config
 m4_ifndef([PKG_PROG_PKG_CONFIG],
        [m4_fatal([Could not locate the pkg-config autoconf macros.  These are usually
