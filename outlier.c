@@ -298,8 +298,6 @@ static double find_mean(size_t n, double *list)
 
 static double find_quartile(size_t n, int q, double *list)
 {
-	if (n % 2 == 1)
-		return list[(n / 4) * q];
 	return (((list[((n / 4) * q) - 1]) + (list[(n / 4) * q])) / 2);
 }
 
