@@ -14,6 +14,7 @@ TESTS = \
 	tests/errors \
 	tests/rrd \
 	tests/simple \
+	tests/whiskers \
 	tests/yaml
 
 EXTRA_DIST = \
