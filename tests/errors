@@ -1,0 +1,21 @@
+#!/bin/bash
+
+IAM="${0##*/}"
+
+if [ ! -d tests/outputs ]; then
+	mkdir tests/outputs
+fi
+
+>| tests/outputs/$IAM
+
+echo "invalid chars in input file" >> tests/outputs/$IAM
+outlier tests/inputs/server-load.rrddump >> tests/outputs/$IAM 2>&1
+
+echo "disk full" >> tests/outputs/$IAM
+outlier --help >/dev/full 2>> tests/outputs/$IAM
+
+echo "zero input" >> tests/outputs/$IAM
+outlier /dev/null >> tests/outputs/$IAM 2>&1
+
+diff -u $top_srcdir/tests/expected/$IAM tests/outputs/$IAM
+exit $?
