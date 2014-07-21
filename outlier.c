@@ -400,6 +400,8 @@ int main(int argc, char **argv)
 		else if (conf.yaml)
 			printf("---\noutlier:\n  stdin:\n");
 		ret = process_file("/dev/stdin", &conf);
+		if (ret)
+			putchar('\n');
 	} else {
 		int i;
 
@@ -408,13 +410,18 @@ int main(int argc, char **argv)
 		else if (conf.yaml)
 			printf("---\noutlier:\n");
 		for (i = optind; i < argc; i++) {
+			int r;
+
 			if (conf.csv)
 				printf("%s,", argv[i]);
 			else if (conf.yaml)
 				printf("  %s:\n", argv[i]);
 			else
 				printf("%s: ", argv[i]);
-			ret |= process_file(argv[i], &conf);
+			r = process_file(argv[i], &conf);
+			if (r)
+				putchar('\n');
+			ret |= r;
 		}
 	}
 	free(conf.list);
