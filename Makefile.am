@@ -11,6 +11,7 @@ TESTS_ENVIRONMENT = top_srcdir=$(top_srcdir) PATH=$(top_builddir)$(PATH_SEPARATO
 
 TESTS = \
 	tests/csv \
+	tests/rrd \
 	tests/simple \
 	tests/yaml
 

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+IAM="${0##*/}"
+
+if [ ! -d tests/outputs ]; then
+	mkdir tests/outputs
+fi
+
+>| tests/outputs/$IAM
+
+echo "rrd input file" >> tests/outputs/$IAM
+outlier --rrdxml tests/inputs/server-load.rrddump >> tests/outputs/$IAM
+
+diff -u $top_srcdir/tests/expected/$IAM tests/outputs/$IAM
+exit $?

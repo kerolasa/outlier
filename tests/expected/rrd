@@ -1,0 +1,2 @@
+rrd input file
+tests/inputs/server-load.rrddump: lof: 0.000000 q1: 0.100000 m: 0.160000 q3: 0.260000 hif: 0.500000 (range: 0.240000 samples: 26220)
