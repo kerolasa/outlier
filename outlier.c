@@ -48,6 +48,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #ifdef HAVE_STDIO_EXT_H
@@ -259,6 +260,7 @@ static size_t read_rrdxml(const char *file, struct outlier_conf *conf)
 static size_t read_digits(const char *file, struct outlier_conf *conf)
 {
 	FILE *fd;
+	struct stat sbuf;
 	double *lp, d;
 	size_t n = 0;
 	int matches;
@@ -266,6 +268,12 @@ static size_t read_digits(const char *file, struct outlier_conf *conf)
 	fd = fopen(file, "r");
 	if (!fd)
 		err(EXIT_FAILURE, "%s", file);
+	if (fstat(fileno(fd), &sbuf))
+		err(EXIT_FAILURE, "cannot stat: %s", file);
+	if (S_ISDIR(sbuf.st_mode)) {
+		warnx("%s: is directory, skipping", file);
+		return 0;
+	}
 	lp = conf->list;
 	while (!feof(fd)) {
 		errno = 0;
