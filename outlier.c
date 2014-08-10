@@ -74,7 +74,7 @@ struct outlier_conf {
 		yaml:1;
 };
 
-static void __attribute__((__noreturn__)) usage(FILE *out)
+static void __attribute__((__noreturn__)) usage(FILE *restrict out)
 {
 	fputs("\nUsage:\n", out);
 	fprintf(out, " %s [options] <file ...>\n", program_invocation_short_name);
@@ -93,13 +93,13 @@ static void __attribute__((__noreturn__)) usage(FILE *out)
 }
 
 #ifndef HAVE___FPENDING
-static inline int __fpending(const FILE *stream __attribute__((__unused__)))
+static inline int __fpending(const FILE *restrict stream __attribute__((__unused__)))
 {
 	return 0;
 }
 #endif
 
-static inline int close_stream(FILE *stream)
+static inline int close_stream(FILE *restrict stream)
 {
 	const int some_pending = (__fpending(stream) != 0);
 	const int prev_fail = (ferror(stream) != 0);
@@ -135,7 +135,7 @@ static void *xmalloc(const const size_t size)
 	return ret;
 }
 
-static void *xrealloc(void *ptr, const size_t size)
+static void *xrealloc(void *restrict ptr, const size_t size)
 {
 	void *ret = realloc(ptr, size);
 
@@ -144,7 +144,7 @@ static void *xrealloc(void *ptr, const size_t size)
 	return ret;
 }
 
-static double xstrtod(const char *str, const char *errmesg)
+static double xstrtod(const char *restrict str, const char *restrict errmesg)
 {
 	double num;
 	char *end = NULL;
@@ -162,12 +162,12 @@ static double xstrtod(const char *str, const char *errmesg)
 	errx(EXIT_FAILURE, "%s: '%s'", errmesg, str);
 }
 
-static int __attribute__((__pure__)) comp_double(const void *a, const void *b)
+static int __attribute__((__pure__)) comp_double(const void *restrict a, const void *restrict b)
 {
 	return *(double *)a < *(double *)b ? -1 : *(double *)a > *(double *)b ? 1 : 0;
 }
 
-static void find_min_max(const xmlXPathContextPtr xpathCtx, struct outlier_conf *conf)
+static void find_min_max(const xmlXPathContextPtr xpathCtx, struct outlier_conf *restrict conf)
 {
 	xmlXPathObjectPtr xpathObj;
 	char *value;
@@ -192,7 +192,7 @@ static void find_min_max(const xmlXPathContextPtr xpathCtx, struct outlier_conf 
 	}
 }
 
-static size_t collect_data(const xmlNodeSetPtr nodes, struct outlier_conf *conf)
+static size_t collect_data(const xmlNodeSetPtr nodes, struct outlier_conf *restrict conf)
 {
 	xmlNodePtr cur;
 	char *value;
@@ -225,7 +225,7 @@ static size_t collect_data(const xmlNodeSetPtr nodes, struct outlier_conf *conf)
 	return n;
 }
 
-static size_t execute_xpath_expression(const char *filename, struct outlier_conf *conf)
+static size_t execute_xpath_expression(const char *restrict filename, struct outlier_conf *restrict conf)
 {
 	xmlDocPtr doc;
 	xmlXPathContextPtr xpathCtx;
@@ -246,7 +246,7 @@ static size_t execute_xpath_expression(const char *filename, struct outlier_conf
 	return ret;
 }
 
-static size_t read_rrdxml(const char *file, struct outlier_conf *conf)
+static size_t read_rrdxml(const char *restrict file, struct outlier_conf *restrict conf)
 {
 	size_t ret;
 
@@ -257,7 +257,7 @@ static size_t read_rrdxml(const char *file, struct outlier_conf *conf)
 	return ret;
 }
 
-static size_t read_digits(const char *file, struct outlier_conf *conf)
+static size_t read_digits(const char *restrict file, struct outlier_conf *restrict conf)
 {
 	FILE *fd;
 	struct stat sbuf;
@@ -297,19 +297,19 @@ static size_t read_digits(const char *file, struct outlier_conf *conf)
 	return n;
 }
 
-static double find_mean(const size_t n, const double *list)
+static double find_mean(const size_t n, const double *restrict list)
 {
 	if (n % 2 == 1)
 		return list[n / 2];
 	return ((list[(n / 2) - 1]  + list[n / 2]) / 2);
 }
 
-static double find_quartile(const size_t n, const int q, const double *list)
+static double find_quartile(const size_t n, const int q, const double *restrict list)
 {
 	return (((list[((n / 4) * q) - 1]) + (list[(n / 4) * q])) / 2);
 }
 
-static int process_file(const char *file, struct outlier_conf *conf)
+static int process_file(const char *restrict file, struct outlier_conf *restrict conf)
 {
 	double mean, q1, q3, range, lof, hif;
 	size_t n;

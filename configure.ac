@@ -24,7 +24,7 @@ AC_CONFIG_MACRO_DIR([m4])
 dnl Checks for programs.
 AC_USE_SYSTEM_EXTENSIONS
 AC_C_RESTRICT
-AC_PROG_CC
+AC_PROG_CC_C99
 
 AC_CHECK_HEADERS([ \
 	stdio_ext.h \
