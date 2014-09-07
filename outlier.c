@@ -367,7 +367,7 @@ int main(const int argc, char **argv)
 	atexit(close_stdout);
 	memset(&conf, 0, sizeof(conf));
 	conf.whiskers = DEFAULT_MULTIPLIER;
-	conf.list_sz = 0x8000;
+	conf.list_sz = 0x400;
 	while ((c = getopt_long(argc, argv, "mxrw:Vh", longopts, NULL)) != -1) {
 		switch (c) {
 		case 'm':
