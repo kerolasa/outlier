@@ -1,4 +1,3 @@
-
 /* This is outlier analysis utility.
  *
  * The outlier has BSD 2-clause license which also known as "Simplified
@@ -214,6 +213,7 @@ static size_t collect_data(const xmlNodeSetPtr nodes, struct outlier_conf *restr
 			*lp = d;
 			n++;
 			if (conf->list_sz < n) {
+				assert(conf->list_sz);
 				conf->list_sz *= 2;
 				conf->list = xrealloc(conf->list, (conf->list_sz * sizeof(double)));
 				lp = conf->list;
@@ -287,6 +287,7 @@ static size_t read_digits(const char *restrict file, struct outlier_conf *restri
 		*lp = d;
 		n++;
 		if (conf->list_sz < n) {
+			assert(conf->list_sz);
 			conf->list_sz *= 2;
 			conf->list = xrealloc(conf->list, (conf->list_sz * sizeof(double)));
 			lp = conf->list;
