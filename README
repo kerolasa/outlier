@@ -1,19 +1,70 @@
-An utility to find low and high fenches from rrd information that can be
-used in monitoring as lower and upper limits for alarming.
+OUTLIER(1)                       User Commands                      OUTLIER(1)
 
-$ echo "71 70 73 70 70 69 70 72 71 300 71 69" |
-> outlier -w 3
-lof: 65.500000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 76.000000 (range: 4.500000)
 
-$ rrdtool dump sample.rrd |
-> outlier --rrdxml
-lof: -105.000000 q1: 155.000000 m: 305.000000 q3: 415.000000 hif: 675.000000 (range: 260.000000)
 
-lof   = low fench (q1 - range)
-q1    = first quartile
-m     = mean
-q3    = third quartile
-hif   = high fench (q3 + range)
-range = q3 - q1
+NAME
+       outlier - find outlier limits from numeric input
 
-The numbers above are just a random sample data.
+SYNOPSIS
+       outlier [options] [file]
+
+DESCRIPTION
+       This  command  reads  from  input files, or stdin when file argument is
+       omitted, numeric input and does  statistics  analysis  to  the  values.
+       Output  put  has  is printed to each input file separately, and it con-
+       tains lof (low fench), q1 (first quartile), mean, q1 (third  quartile),
+       hif  (high fench), range how much values differ, and samples that tells
+       how many data points the calculation got as an input.   The  output  is
+       same as what is basis of a traditional boxplot.
+
+OPTIONS
+       -m, --min value
+              Minimum allowed value.  When lof is calculated to be smaller the
+              minimum value is printed instead.
+
+       -x, --max value
+              Maximum allowed value.  When hif is calculated to be greater the
+              maximum value is printed instead.
+
+       -r, --rrdxml
+              Read  rrd archive database row values from rrdtool dump xml out-
+              put.
+
+       -w, --whiskers multiplier
+              Multiply interquartile range by a floating point number, to  set
+              lof  and  hif  to be closer (multiplier < 1.0) or further (1.0 <
+              multplier).  The default multiplier is 1.5.  If the dump has  in
+              definition for min and/or max data set values they are used as a
+              minimun and maximum printout values for lof  and  hif  when  the
+              calculated value is out of range.
+
+       -V, --version
+              Display version information and exit.
+
+       -h, --help
+              Display help and exit.
+
+EXAMPLE
+       Dump  rrd a file, filter output to contain only measurement values, and
+       analyze.
+
+       rrdtool dump file.rrd | outlier --rrdxml
+       cat lots_of_numbers | outlier
+       outlier input_file_1 input_file_2
+
+NOTES
+       This command was originally wrote to assist finding reasonable alarming
+       thresholds from rrd files.  The lof and hif can be considered as a rea-
+       sonable guess when a measurement exceeds limit of begin normal, and  an
+       alarm should be sent.
+
+SEE ALSO
+       rrdtool(1), <http://en.wikipedia.org/wiki/Box_plot>
+
+AVAILABILITY
+       The  outlier  command  can  be  found  from github <https://github.com/
+       kerolasa/outlier/>.
+
+
+
+outlier                           2014-06-14                        OUTLIER(1)
