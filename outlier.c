@@ -212,7 +212,7 @@ static size_t collect_data(const xmlNodeSetPtr nodes, struct outlier_conf *restr
 				continue;
 			*lp = d;
 			n++;
-			if (conf->list_sz < n) {
+			if (conf->list_sz == n) {
 				assert(conf->list_sz);
 				conf->list_sz *= 2;
 				conf->list = xrealloc(conf->list, (conf->list_sz * sizeof(double)));
@@ -286,7 +286,7 @@ static size_t read_digits(const char *restrict file, struct outlier_conf *restri
 			continue;
 		*lp = d;
 		n++;
-		if (conf->list_sz < n) {
+		if (conf->list_sz == n) {
 			assert(conf->list_sz);
 			conf->list_sz *= 2;
 			conf->list = xrealloc(conf->list, (conf->list_sz * sizeof(double)));
