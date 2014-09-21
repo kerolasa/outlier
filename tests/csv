@@ -9,13 +9,14 @@ fi
 >| tests/outputs/$IAM
 
 echo "one file test" >> tests/outputs/$IAM
-outlier --csv tests/inputs/simple.dat >> tests/outputs/$IAM
+outlier --csv $top_srcdir/tests/inputs/simple.dat >> tests/outputs/$IAM
 
 echo "two files test" >> tests/outputs/$IAM
-outlier --csv tests/inputs/simple.dat tests/inputs/simple.dat >> tests/outputs/$IAM
+outlier --csv $top_srcdir/tests/inputs/simple.dat $top_srcdir/tests/inputs/simple.dat >> tests/outputs/$IAM
 
 echo "stdin test" >> tests/outputs/$IAM
-cat tests/inputs/simple.dat | outlier --csv >> tests/outputs/$IAM
+cat $top_srcdir/tests/inputs/simple.dat | outlier --csv >> tests/outputs/$IAM
 
+sed -i "s|$top_srcdir/tests/inputs/||g" tests/outputs/$IAM
 diff -u $top_srcdir/tests/expected/$IAM tests/outputs/$IAM
 exit $?

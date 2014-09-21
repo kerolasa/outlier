@@ -22,7 +22,5 @@ EXTRA_DIST = \
 	tests/inputs \
 	$(TESTS)
 
-clean-local-tests:
+clean-local:
 	rm -rf $(top_builddir)/tests/outputs
-
-CLEAN_LOCALS = clean-local-tests

@@ -1,7 +1,7 @@
 one file test
 ---
 outlier:
-  tests/inputs/simple.dat:
+  simple.dat:
     lof: 67.750000
     q1: 70.000000
     m: 70.500000
@@ -12,7 +12,7 @@ outlier:
 two files test
 ---
 outlier:
-  tests/inputs/simple.dat:
+  simple.dat:
     lof: 67.750000
     q1: 70.000000
     m: 70.500000
@@ -20,7 +20,7 @@ outlier:
     hif: 73.750000
     range: 2.250000
     samples: 12
-  tests/inputs/simple.dat:
+  simple.dat:
     lof: 67.750000
     q1: 70.000000
     m: 70.500000

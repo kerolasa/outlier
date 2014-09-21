@@ -9,7 +9,7 @@ fi
 >| tests/outputs/$IAM
 
 echo "invalid chars in input file" >> tests/outputs/$IAM
-outlier tests/inputs/server-load.rrddump >> tests/outputs/$IAM 2>&1
+outlier $top_srcdir/tests/inputs/server-load.rrddump >> tests/outputs/$IAM 2>&1
 
 echo "disk full" >> tests/outputs/$IAM
 outlier --help >/dev/full 2>> tests/outputs/$IAM
@@ -21,5 +21,6 @@ echo "invalid whiskers" >> tests/outputs/$IAM
 outlier --whiskers 1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 /dev/null >> tests/outputs/$IAM 2>&1
 outlier --whiskers string /dev/null >> tests/outputs/$IAM 2>&1
 
+sed -i "s|$top_srcdir/tests/inputs/||g" tests/outputs/$IAM
 diff -u $top_srcdir/tests/expected/$IAM tests/outputs/$IAM
 exit $?

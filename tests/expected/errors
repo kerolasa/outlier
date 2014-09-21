@@ -1,5 +1,5 @@
 invalid chars in input file
-tests/inputs/server-load.rrddump: lof: -3023.500000 q1: -1.000000 m: 0.440000 q3: 2014.000000 hif: 5036.500000 (range: 3022.500000 samples: 210201)
+server-load.rrddump: lof: -3023.500000 q1: -1.000000 m: 0.440000 q3: 2014.000000 hif: 5036.500000 (range: 3022.500000 samples: 210201)
 disk full
 outlier: write error: No space left on device
 zero input

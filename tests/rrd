@@ -9,7 +9,8 @@ fi
 >| tests/outputs/$IAM
 
 echo "rrd input file" >> tests/outputs/$IAM
-outlier --rrdxml tests/inputs/server-load.rrddump >> tests/outputs/$IAM
+outlier --rrdxml $top_srcdir/tests/inputs/server-load.rrddump >> tests/outputs/$IAM
 
+sed -i "s|$top_srcdir/tests/inputs/||g" tests/outputs/$IAM
 diff -u $top_srcdir/tests/expected/$IAM tests/outputs/$IAM
 exit $?

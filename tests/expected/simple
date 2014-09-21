@@ -1,9 +1,9 @@
 one file test
-tests/inputs/simple.dat: lof: 67.750000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 73.750000 (range: 2.250000 samples: 12)
+simple.dat: lof: 67.750000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 73.750000 (range: 2.250000 samples: 12)
 two files test
-tests/inputs/simple.dat: lof: 67.750000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 73.750000 (range: 2.250000 samples: 12)
-tests/inputs/simple.dat: lof: 67.750000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 73.750000 (range: 2.250000 samples: 12)
+simple.dat: lof: 67.750000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 73.750000 (range: 2.250000 samples: 12)
+simple.dat: lof: 67.750000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 73.750000 (range: 2.250000 samples: 12)
 stdin test
 lof: 67.750000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 73.750000 (range: 2.250000 samples: 12)
 horizontal numbers test
-tests/inputs/horizontal.dat: lof: 67.750000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 73.750000 (range: 2.250000 samples: 12)
+horizontal.dat: lof: 67.750000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 73.750000 (range: 2.250000 samples: 12)
