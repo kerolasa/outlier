@@ -18,6 +18,7 @@ TESTS = \
 	tests/yaml
 
 EXTRA_DIST = \
+	contrib/outlier.spec \
 	tests/expected \
 	tests/inputs \
 	$(TESTS)
