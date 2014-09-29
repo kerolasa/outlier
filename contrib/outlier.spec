@@ -18,7 +18,7 @@ Source0:	%{name}-%{version}.tar.xz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires: xz
-BuildRequires: autoconf >= 2.69
+BuildRequires: autoconf >= 2.59
 BuildRequires: automake
 
 %description

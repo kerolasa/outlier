@@ -1,6 +1,6 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
-AC_PREREQ([2.69])
+AC_PREREQ([2.59])
 AC_INIT([outlier],
 	[m4_esyscmd([build-aux/git-version-gen .tarball-version])],
 	[kerolasa@iki.fi],[],
