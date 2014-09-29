@@ -24,3 +24,15 @@ EXTRA_DIST = \
 
 clean-local:
 	rm -rf $(top_builddir)/tests/outputs
+
+extrasdir = $(datadir)/@PACKAGE@
+dist_extras_DATA = ChangeLog
+
+dist-hook: gen-ChangeLog
+.PHONY: gen-ChangeLog
+gen-ChangeLog:
+	$(AM_V_GEN)if test -d .git; then                        \
+		git log --abbrev-commit --pretty=oneline --graph >| $(distdir)/cl-t &&  \
+		{ rm -f $(distdir)/ChangeLog &&                 \
+		  mv $(distdir)/cl-t $(distdir)/ChangeLog ; }   \
+	fi
