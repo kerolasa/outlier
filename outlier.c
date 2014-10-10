@@ -37,6 +37,7 @@
 #include <assert.h>
 #include <err.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <getopt.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
@@ -274,6 +275,13 @@ static size_t read_digits(const char *restrict file, struct outlier_conf *restri
 		warnx("%s: is directory, skipping", file);
 		return 0;
 	}
+#ifdef HAVE_POSIX_FADVISE
+# ifdef POSIX_FADV_SEQUENTIAL
+	errno = 0;
+	if (posix_fadvise(fileno(fd), 0, 0, POSIX_FADV_SEQUENTIAL) != 0 && errno)
+		err(EXIT_FAILURE, "fadvise %s", file);
+# endif
+#endif
 	lp = conf->list;
 	while (!feof(fd)) {
 		errno = 0;

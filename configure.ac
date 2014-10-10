@@ -32,6 +32,7 @@ AC_CHECK_HEADERS([ \
 
 AC_CHECK_FUNCS([ \
 	__fpending \
+	posix_fadvise \
 ])
 
 dnl Require pkg-config
