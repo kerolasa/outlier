@@ -367,24 +367,40 @@ static int process_file(const char *restrict file, struct outlier_conf *restrict
 	q1 = find_quartile(n, 1, conf->list);
 	mean = find_mean(n, conf->list);
 	q3 = find_quartile(n, 3, conf->list);
-	range = (q3 - q1) * conf->whiskers;
-	if (conf->min_set && q1 - range < conf->min)
-		lof = conf->min;
-	else
-		lof = q1 - range;
-	if (conf->max_set && conf->max < q3 + range)
-		hif = conf->max;
-	else
-		hif = q3 + range;
-	if (conf->csv)
-		printf("%f,%f,%f,%f,%f,%f,%zu\n",
-		       lof, q1, mean, q3, hif, range, n);
-	else if (conf->yaml)
-		printf("    lof: %f\n    q1: %f\n    m: %f\n    q3: %f\n    hif: %f\n    range: %f\n    samples: %zu\n",
-		       lof, q1, mean, q3, hif, range, n);
-	else
-		printf("lof: %f q1: %f m: %f q3: %f hif: %f (range: %f samples: %zu)\n",
-		       lof, q1, mean, q3, hif, range, n);
+	if (conf->whiskers) {
+		range = (q3 - q1) * conf->whiskers;
+		if (conf->min_set && q1 - range < conf->min)
+			lof = conf->min;
+		else
+			lof = q1 - range;
+		if (conf->max_set && conf->max < q3 + range)
+			hif = conf->max;
+		else
+			hif = q3 + range;
+		if (conf->csv)
+			printf("%f,%f,%f,%f,%f,%f,%zu\n",
+			       lof, q1, mean, q3, hif, range, n);
+		else if (conf->yaml)
+			printf
+			    ("    lof: %f\n    q1: %f\n    m: %f\n    q3: %f\n    hif: %f\n    range: %f\n    samples: %zu\n",
+			     lof, q1, mean, q3, hif, range, n);
+		else
+			printf
+			    ("lof: %f q1: %f m: %f q3: %f hif: %f (range: %f samples: %zu)\n",
+			     lof, q1, mean, q3, hif, range, n);
+	} else {
+		if (conf->csv)
+			printf("%f,%f,%f,%zu\n",
+			       q1, mean, q3, n);
+		else if (conf->yaml)
+			printf
+			    ("    q1: %f\n    m: %f\n    q3: %f\n    samples: %zu\n",
+			     q1, mean, q3, n);
+		else
+			printf
+			    ("q1: %f m: %f q3: %f (samples: %zu)\n",
+			     q1, mean, q3, n);
+	}
 	return 0;
 }
 
@@ -446,8 +462,10 @@ int main(const int argc, char **argv)
 		errx(EXIT_FAILURE, "--csv and --yaml are mutually exclusive");
 	conf.list = xmalloc(conf.list_sz * sizeof(double));
 	if (argc == optind) {
-		if (conf.csv)
+		if (conf.csv && conf.whiskers)
 			printf("lof,q1,m,q3,hif,range,samples\n");
+		else if (conf.csv)
+			printf("q1,m,q3,samples\n");
 		else if (conf.yaml)
 			printf("---\noutlier:\n  stdin:\n");
 		ret = process_file("/dev/stdin", &conf);
@@ -456,8 +474,10 @@ int main(const int argc, char **argv)
 	} else {
 		int i;
 
-		if (conf.csv)
+		if (conf.csv && conf.whiskers)
 			puts("name,lof,q1,m,q3,hif,range,samples");
+		else if (conf.csv)
+			puts("q1,m,q3,samples");
 		else if (conf.yaml)
 			printf("---\noutlier:\n");
 		for (i = optind; i < argc; i++) {
