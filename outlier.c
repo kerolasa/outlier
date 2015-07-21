@@ -60,6 +60,40 @@
 #define RRD_MIN "/rrd/ds/min"
 #define RRD_MAX "/rrd/ds/max"
 
+#ifndef HAVE_PROGRAM_INVOCATION_SHORT_NAME
+# ifdef HAVE___PROGNAME
+extern char *__progname;
+#  define program_invocation_short_name __progname
+# else
+#  ifdef HAVE_GETEXECNAME
+#   define program_invocation_short_name \
+		prog_inv_sh_nm_from_file(getexecname(), 0)
+#  else
+#   define program_invocation_short_name \
+		prog_inv_sh_nm_from_file(__FILE__, 1)
+#  endif
+static char prog_inv_sh_nm_buf[256];
+static inline char *
+prog_inv_sh_nm_from_file(char *f, char stripext)
+{
+	char *t;
+
+	if ((t = strrchr(f, '/')) != NULL)
+		t++;
+	else
+		t = f;
+
+	strncpy(prog_inv_sh_nm_buf, t, sizeof(prog_inv_sh_nm_buf) - 1);
+	prog_inv_sh_nm_buf[sizeof(prog_inv_sh_nm_buf) - 1] = '\0';
+
+	if (stripext && (t = strrchr(prog_inv_sh_nm_buf, '.')) != NULL)
+		*t = '\0';
+
+	return prog_inv_sh_nm_buf;
+}
+# endif
+#endif
+
 struct outlier_conf {
 	double whiskers;
 	double *list;

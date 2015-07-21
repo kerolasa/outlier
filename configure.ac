@@ -47,6 +47,25 @@ PKG_PROG_PKG_CONFIG
 
 PKG_CHECK_MODULES([LIBXML2], [libxml-2.0])
 
+AC_MSG_CHECKING([whether program_invocation_short_name is defined])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+	#include <argp.h>
+]], [[
+	program_invocation_short_name = "test";
+]])], [
+	AC_MSG_RESULT([yes])
+	AC_DEFINE([HAVE_PROGRAM_INVOCATION_SHORT_NAME], [1],
+		[Define if program_invocation_short_name is defined])
+], [
+	AC_MSG_RESULT([no])
+])
+AC_MSG_CHECKING([whether __progname is defined])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([extern char *__progname;],
+	   [if (*__progname == 0) return;])],
+	   AC_DEFINE([HAVE___PROGNAME], [1], [Define if __progname is defined])
+	   AC_MSG_RESULT([yes]),
+	   AC_MSG_RESULT([no]))
+
 AC_CONFIG_FILES([
 	Makefile
 ])
