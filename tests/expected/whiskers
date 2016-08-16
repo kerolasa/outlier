@@ -1,5 +1,5 @@
 zero
-simple.dat: lof: 70.000000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 71.500000 (range: 0.000000 samples: 12)
+simple.dat: q1: 70.000000 m: 70.500000 q3: 71.500000 (samples: 12)
 one
 simple.dat: lof: 68.500000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 73.000000 (range: 1.500000 samples: 12)
 1024
