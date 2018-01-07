@@ -34,6 +34,8 @@
  * official policies, either expressed or implied, of Sami Kerola.
  */
 
+#include "config.h"
+
 #include <assert.h>
 #include <err.h>
 #include <errno.h>
