@@ -441,7 +441,7 @@ int main(const int argc, char **argv)
 	memset(&conf, 0, sizeof(conf));
 	conf.whiskers = DEFAULT_MULTIPLIER;
 	conf.list_sz = 0x400;
-	while ((c = getopt_long(argc, argv, "mxrw:Vh", longopts, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "m:x:rw:Vh", longopts, NULL)) != -1) {
 		switch (c) {
 		case 'm':
 			conf.min = xstrtod(optarg, "failed to parse min");
