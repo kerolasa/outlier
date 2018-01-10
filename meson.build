@@ -37,4 +37,6 @@ config_h = configure_file(
 
 executable('outlier', 'outlier.c', dependencies : libxml2_dep, install : true)
 
+install_man ('outlier.1')
+
 subdir('tests')
