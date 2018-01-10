@@ -41,10 +41,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <getopt.h>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-#include <libxml/xpath.h>
-#include <libxml/xpathInternals.h>
 #include <limits.h>
 #include <math.h>
 #include <stdio.h>
@@ -53,15 +49,21 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#if HAVE_LIBXML2
+# include <libxml/parser.h>
+# include <libxml/tree.h>
+# include <libxml/xpath.h>
+# include <libxml/xpathInternals.h>
+# define RRD_DATA "/rrd/rra/database/row/v"
+# define RRD_MIN "/rrd/ds/min"
+# define RRD_MAX "/rrd/ds/max"
+#endif
+
 #ifdef HAVE_STDIO_EXT_H
 # include <stdio_ext.h>
 #endif
 
 #define DEFAULT_MULTIPLIER 1.5
-#define RRD_DATA "/rrd/rra/database/row/v"
-#define RRD_MIN "/rrd/ds/min"
-#define RRD_MAX "/rrd/ds/max"
-
 #ifndef HAVE_PROGRAM_INVOCATION_SHORT_NAME
 # ifdef HAVE___PROGNAME
 extern char *__progname;
@@ -103,7 +105,9 @@ struct outlier_conf {
 	double min;
 	double max;
 	unsigned int
+#if HAVE_LIBXML2
 		rrdxml:1,
+#endif
 		min_set:1,
 		max_set:1,
 		csv:1,
@@ -117,7 +121,9 @@ static void __attribute__((__noreturn__)) usage(FILE *restrict out)
 	fputs("\nOptions:\n", out);
 	fputs(" -m, --min <num>      minimum value for printout range\n", out);
 	fputs(" -x, --max <num>      maximum value for printout range\n", out);
+#if HAVE_LIBXML2
 	fputs(" -r, --rrdxml         input is rrdtool --dump output\n", out);
+#endif
 	fputs(" -w, --whiskers <num> interquartile range multiplier\n", out);
 	fputs("     --csv            output comma separated values\n", out);
 	fputs("     --yaml           output yaml data\n", out);
@@ -203,6 +209,7 @@ static int __attribute__((__pure__)) comp_double(const void *restrict a, const v
 	return *(double *)a < *(double *)b ? -1 : *(double *)a > *(double *)b ? 1 : 0;
 }
 
+#if HAVE_LIBXML2
 static void find_min_max(const xmlXPathContextPtr xpathCtx, struct outlier_conf *restrict conf)
 {
 	xmlXPathObjectPtr xpathObj;
@@ -293,6 +300,7 @@ static size_t read_rrdxml(const char *restrict file, struct outlier_conf *restri
 	xmlCleanupParser();
 	return ret;
 }
+#endif /* HAVE_LIBXML2 */
 
 static size_t read_digits(const char *restrict file, struct outlier_conf *restrict conf)
 {
@@ -359,9 +367,11 @@ static int process_file(const char *restrict file, struct outlier_conf *restrict
 	double mean, q1, q3, range, lof, hif;
 	size_t n;
 
+#if HAVE_LIBXML2
 	if (conf->rrdxml)
 		n = read_rrdxml(file, conf);
 	else
+#endif
 		n = read_digits(file, conf);
 	if (n < 1)
 		return 1;
@@ -417,7 +427,9 @@ int main(const int argc, char **argv)
 	static const struct option longopts[] = {
 		{"min", required_argument, NULL, 'm'},
 		{"max", required_argument, NULL, 'x'},
+#if HAVE_LIBXML2
 		{"rrdxml", no_argument, NULL, 'r'},
+#endif
 		{"whiskers", required_argument, NULL, 'w'},
 		{"csv", no_argument, NULL, CSV_OPT},
 		{"yaml", no_argument, NULL, YAML_OPT},
@@ -439,9 +451,11 @@ int main(const int argc, char **argv)
 			conf.max = xstrtod(optarg, "failed to parse max");
 			conf.max_set = 1;
 			break;
+#if HAVE_LIBXML2
 		case 'r':
 			conf.rrdxml = 1;
 			break;
+#endif
 		case 'w':
 			conf.whiskers = xstrtod(optarg, "failed to parse multiplier");
 			break;

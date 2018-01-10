@@ -1,11 +1,15 @@
 test_scripts = [
 	'csv',
 	'errors',
-	'rrd',
 	'simple',
 	'whiskers',
 	'yaml',
 ]
+if libxml2_dep.found()
+	test_scripts += [
+		'rrd',
+	]
+endif
 env = environment()
 env.set('top_srcdir', meson.source_root())
 env.set('PATH', meson.build_root() + ':/usr/bin:/bin:/usr/sbin:/sbin')

@@ -10,7 +10,8 @@ conf.set_quoted('PACKAGE_VERSION', meson.project_version())
 conf.set_quoted('PACKAGE_BUGREPORT', 'kerolasa@iki.fi')
 conf.set('_GNU_SOURCE', 1)
 
-libxml2_dep = dependency('libxml-2.0')
+libxml2_dep = dependency('libxml-2.0', required : false)
+conf.set10('HAVE_LIBXML2', libxml2_dep.found())
 
 foreach h : [
 	'stdio_ext.h',
