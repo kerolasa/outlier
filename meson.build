@@ -50,6 +50,30 @@ foreach f : [
 	endif
 endforeach
 
+if cc.compiles('
+	#define _GNU_SOURCE
+	#include <errno.h>
+	int main(void) {
+		program_invocation_short_name = "test";
+		return 0;
+	}
+', name : 'program_invocation_short_name')
+	conf.set('HAVE_PROGRAM_INVOCATION_SHORT_NAME', 1,
+		description : 'Define if program_invocation_short_name is defined')
+endif
+
+if cc.compiles('
+	extern char *__progname;
+	int main(void) {
+		if (*__progname == 0)
+			return 1;
+		return 0;
+	}
+', name : '__progname')
+	conf.set('HAVE___PROGNAME', 1,
+		description : 'Define if __progname is defined')
+endif
+
 config_h = configure_file(
 	output : 'config.h',
 	configuration : conf)
