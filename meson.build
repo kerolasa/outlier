@@ -6,7 +6,6 @@ project('outlier', 'c',
 cc = meson.get_compiler('c')
 
 c_flags = '''
-	-D_GNU_SOURCE
 	-O3
 	-g
 	-fno-strict-aliasing
