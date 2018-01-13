@@ -35,6 +35,7 @@
  */
 
 #include "config.h"
+#include "git-version.h"
 
 #include <assert.h>
 #include <err.h>

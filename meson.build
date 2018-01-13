@@ -6,7 +6,6 @@ cc = meson.get_compiler('c')
 
 conf = configuration_data()
 conf.set_quoted('PACKAGE_NAME', meson.project_name())
-conf.set_quoted('PACKAGE_VERSION', meson.project_version())
 conf.set_quoted('PACKAGE_BUGREPORT', 'kerolasa@iki.fi')
 conf.set('_GNU_SOURCE', 1)
 
@@ -33,10 +32,20 @@ foreach f : [
 endforeach
 
 config_h = configure_file(
-        output : 'config.h',
-        configuration : conf)
+	output : 'config.h',
+	configuration : conf)
 
-executable('outlier', 'outlier.c', dependencies : libxml2_dep, install : true)
+git_version_h = vcs_tag(
+	input : 'git-version.h.meson',
+	output : 'git-version.h'
+)
+
+includes = include_directories('.')
+executable('outlier', 'outlier.c', git_version_h,
+	dependencies : libxml2_dep,
+	include_directories : includes,
+	install : true
+)
 
 install_man ('outlier.1')
 
