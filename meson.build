@@ -2,7 +2,26 @@ project('outlier', 'c',
 	default_options : ['c_std=c99'],
 	version : '1.0')
 
+
 cc = meson.get_compiler('c')
+
+c_flags = '''
+	-D_GNU_SOURCE
+	-O3
+	-g
+	-fno-strict-aliasing
+	-Wstrict-prototypes
+	-Wall
+	-Wextra
+'''.split()
+
+foreach arg : c_flags
+	if cc.has_argument(arg)
+		add_project_arguments(arg, language : 'c')
+	endif
+endforeach
+
+add_project_arguments('-include', 'config.h', language : 'c')
 
 conf = configuration_data()
 conf.set_quoted('PACKAGE_NAME', meson.project_name())
