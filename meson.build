@@ -1,24 +1,15 @@
 project('outlier', 'c',
-	default_options : ['c_std=c99'],
-	version : '1.0')
-
+	default_options : [
+		'c_std=c99',
+		'buildtype=debugoptimized',
+		'warning_level=2',
+	],
+	license : 'BSD 2-clause',
+	version : '1.0',
+	meson_version : '>= 0.44.0',
+)
 
 cc = meson.get_compiler('c')
-
-c_flags = '''
-	-O3
-	-g
-	-fno-strict-aliasing
-	-Wstrict-prototypes
-	-Wall
-	-Wextra
-'''.split()
-
-foreach arg : c_flags
-	if cc.has_argument(arg)
-		add_project_arguments(arg, language : 'c')
-	endif
-endforeach
 
 add_project_arguments('-include', 'config.h', language : 'c')
 
