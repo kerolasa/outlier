@@ -32,6 +32,7 @@ endforeach
 
 foreach f : [
 	'__fpending',
+	'getexecname',
 	'posix_fadvise',
 ]
 	if cc.has_function(f, args : '-D_GNU_SOURCE')
