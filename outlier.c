@@ -203,7 +203,7 @@ static double xstrtod(const char *restrict str, const char *restrict errmesg)
 	errx(EXIT_FAILURE, "%s: '%s'", errmesg, str);
 }
 
-static int __attribute__((__pure__)) comp_double(const void *restrict a, const void *restrict b)
+static int comp_double(const void *restrict a, const void *restrict b)
 {
 	return *(double *)a < *(double *)b ? -1 : *(double *)a > *(double *)b ? 1 : 0;
 }
