@@ -77,8 +77,8 @@ extern char *__progname;
 		prog_inv_sh_nm_from_file(__FILE__, 1)
 #  endif
 static char prog_inv_sh_nm_buf[256];
-static inline char *
-prog_inv_sh_nm_from_file(char *f, char stripext)
+
+static inline char *prog_inv_sh_nm_from_file(char *f, char stripext)
 {
 	char *t;
 
@@ -353,7 +353,7 @@ static double find_mean(const size_t n, const double *restrict list)
 {
 	if (n % 2 == 1)
 		return list[n / 2];
-	return ((list[(n / 2) - 1]  + list[n / 2]) / 2);
+	return ((list[(n / 2) - 1] + list[n / 2]) / 2);
 }
 
 static double find_quartile(const size_t n, const int q, const double *restrict list)
