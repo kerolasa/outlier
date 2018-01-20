@@ -1,3 +1,5 @@
+# See build status from:
+# https://travis-ci.org/kerolasa/outlier
 sudo: false
 language: c
 dist: trusty
