@@ -81,6 +81,12 @@ executable('outlier', 'outlier.c', git_version_h,
 	install : true
 )
 
-install_man ('outlier.1')
+docconf = configuration_data()
+docconf.set('version', meson.project_version())
+man_page = configure_file(input : 'outlier.1.in',
+	output : 'outlier.1',
+	configuration : docconf
+)
+install_man(man_page)
 
 subdir('tests')

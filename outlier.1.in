@@ -1,4 +1,4 @@
-.TH OUTLIER "1" "2014-06-14" "outlier" "User Commands"
+.TH OUTLIER "1" "@version@" "outlier" "User Commands"
 .SH NAME
 outlier \- find outlier limits from numeric input
 .SH SYNOPSIS
