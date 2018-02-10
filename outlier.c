@@ -435,11 +435,17 @@ int main(const int argc, char **argv)
 		{"help", no_argument, NULL, 'h'},
 		{NULL, 0, NULL, 0}
 	};
+	const char *shortopts = "m:x:w:Vh"
+#if HAVE_LIBXML2
+	"r"
+#endif
+	;
+
 	atexit(close_stdout);
 	memset(&conf, 0, sizeof(conf));
 	conf.whiskers = DEFAULT_MULTIPLIER;
 	conf.list_sz = 0x400;
-	while ((c = getopt_long(argc, argv, "m:x:rw:Vh", longopts, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, shortopts, longopts, NULL)) != -1) {
 		switch (c) {
 		case 'm':
 			conf.min = xstrtod(optarg, "failed to parse min");
