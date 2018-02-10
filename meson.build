@@ -18,7 +18,21 @@ conf.set_quoted('PACKAGE_NAME', meson.project_name())
 conf.set_quoted('PACKAGE_BUGREPORT', 'kerolasa@iki.fi')
 conf.set('_GNU_SOURCE', 1)
 
-libxml2_dep = dependency('libxml-2.0', required : false)
+default_multiplier = get_option('DEFAULT_MULTIPLIER')
+multiplier_arr = default_multiplier.split('.')
+if 2 < multiplier_arr.length()
+	error('invalid DEFAULT_MULTIPLIER, should be: int.int')
+endif
+foreach i : multiplier_arr
+	num = i.to_int()
+endforeach
+conf.set('DEFAULT_MULTIPLIER', default_multiplier)
+
+if get_option('USE_LIBXML2')
+	libxml2_dep = dependency('libxml-2.0', required : false)
+else
+	libxml2_dep = disabler()
+endif
 conf.set10('HAVE_LIBXML2', libxml2_dep.found())
 
 foreach h : [
@@ -83,6 +97,7 @@ executable('outlier', 'outlier.c', git_version_h,
 
 docconf = configuration_data()
 docconf.set('version', meson.project_version())
+docconf.set('default_multiplier', default_multiplier)
 man_page = configure_file(input : 'outlier.1.in',
 	output : 'outlier.1',
 	configuration : docconf

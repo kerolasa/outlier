@@ -63,7 +63,6 @@
 # include <stdio_ext.h>
 #endif
 
-#define DEFAULT_MULTIPLIER 1.5
 #ifndef HAVE_PROGRAM_INVOCATION_SHORT_NAME
 # ifdef HAVE___PROGNAME
 extern char *__progname;
