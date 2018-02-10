@@ -31,7 +31,7 @@ conf.set('DEFAULT_MULTIPLIER', default_multiplier)
 if get_option('USE_LIBXML2')
 	libxml2_dep = dependency('libxml-2.0', required : false)
 else
-	libxml2_dep = disabler()
+	libxml2_dep = dependency('disabler-appears-to-disable-executable-build', required : false)
 endif
 conf.set10('HAVE_LIBXML2', libxml2_dep.found())
 
