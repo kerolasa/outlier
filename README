@@ -1,7 +1,5 @@
 OUTLIER(1)                       User Commands                      OUTLIER(1)
 
-
-
 NAME
        outlier - find outlier limits from numeric input
 
@@ -11,7 +9,7 @@ SYNOPSIS
 DESCRIPTION
        This  command  reads  from  input files, or stdin when file argument is
        omitted, numeric input and does  statistics  analysis  to  the  values.
-       Output  put  has  is printed to each input file separately, and it con-
+       Output  put  has  is printed to each input file separately, and it con‐
        tains lof (low fench), q1 (first quartile), mean, q1 (third  quartile),
        hif  (high fench), range how much values differ, and samples that tells
        how many data points the calculation got as an input.   The  output  is
@@ -27,7 +25,7 @@ OPTIONS
               maximum value is printed instead.
 
        -r, --rrdxml
-              Read  rrd archive database row values from rrdtool dump xml out-
+              Read  rrd archive database row values from rrdtool dump xml out‐
               put.
 
        -w, --whiskers multiplier
@@ -36,7 +34,9 @@ OPTIONS
               multplier).  The default multiplier is 1.5.  If the dump has  in
               definition for min and/or max data set values they are used as a
               minimun and maximum printout values for lof  and  hif  when  the
-              calculated value is out of range.
+              calculated  value  is  out  of range.  When multiplier is set to
+              zero printing (and related computation) of lof, hif and range is
+              omitted.
 
        -V, --version
               Display version information and exit.
@@ -54,17 +54,15 @@ EXAMPLE
 
 NOTES
        This command was originally wrote to assist finding reasonable alarming
-       thresholds from rrd files.  The lof and hif can be considered as a rea-
+       thresholds from rrd files.  The lof and hif can be considered as a rea‐
        sonable guess when a measurement exceeds limit of begin normal, and  an
        alarm should be sent.
 
 SEE ALSO
-       rrdtool(1), <http://en.wikipedia.org/wiki/Box_plot>
+       rrdtool(1), ⟨http://en.wikipedia.org/wiki/Box_plot⟩
 
 AVAILABILITY
-       The  outlier  command  can  be  found  from github <https://github.com/
-       kerolasa/outlier/>.
+       The  outlier  command  can  be  found  from github ⟨https://github.com/
+       kerolasa/outlier/⟩.
 
-
-
-outlier                           2014-06-14                        OUTLIER(1)
+outlier                               1.0                           OUTLIER(1)
