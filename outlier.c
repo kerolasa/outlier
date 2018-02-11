@@ -129,7 +129,8 @@ static void __attribute__((__noreturn__)) usage(FILE *restrict out)
 	fputs(" -h, --help           display this help and exit\n", out);
 	fputs(" -V, --version        output version information and exit\n", out);
 	fputs("\n", out);
-	fprintf(out, "For more details see %s(1).\n", PACKAGE_NAME);
+	fprintf(out, "Report bug to <%s>.\n", PACKAGE_BUGREPORT);
+	fprintf(out, "For more details see: man 1 %s\n", PACKAGE_NAME);
 	exit(out == stderr ? EXIT_FAILURE : EXIT_SUCCESS);
 }
 
