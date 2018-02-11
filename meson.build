@@ -18,12 +18,12 @@ cc = meson.get_compiler('c')
 # something computer does for me without me needing to think about it.
 add_project_arguments('-include', 'config.h', language : 'c')
 
-# Contents of the 'conf' variables are wrote to config.h
-conf = configuration_data()
-conf.set_quoted('PACKAGE_NAME', meson.project_name())
-conf.set_quoted('PACKAGE_BUGREPORT', 'kerolasa@iki.fi')
+# Contents of the 'config_h' variables are wrote to config.h
+config_h = configuration_data()
+config_h.set_quoted('PACKAGE_NAME', meson.project_name())
+config_h.set_quoted('PACKAGE_BUGREPORT', 'kerolasa@iki.fi')
 # Use all features.  See features.h for details.
-conf.set('_GNU_SOURCE', 1)
+config_h.set('_GNU_SOURCE', 1)
 
 # Validate 'meson configure build -Ddefault_multiplier=' value.  Because
 # meson does not support float data type this is a bit klunky, but works.
@@ -35,7 +35,7 @@ endif
 foreach i : multiplier_arr
 	num = i.to_int()
 endforeach
-conf.set('DEFAULT_MULTIPLIER', default_multiplier)
+config_h.set('DEFAULT_MULTIPLIER', default_multiplier)
 
 # By default try to compile with libxml2, but that can be turned off with
 # 'meson configure -Duse_libxml2=false'.
@@ -47,7 +47,7 @@ else
 endif
 # Set config.h variable to 1 if libxml2 is wanted and found, else it is
 # zero.  Use '#if HAVE_LIBXML2' preprocessor directive when checking these.
-conf.set10('HAVE_LIBXML2', libxml2_dep.found())
+config_h.set10('HAVE_LIBXML2', libxml2_dep.found())
 
 # Check headers, and if found add HAVE_HEADER_NAME_H markup to config.h
 # file.  Use '#ifdef' preprocessor directive when checking these.  If you
@@ -56,7 +56,7 @@ foreach h : '''
 	stdio_ext.h
 '''.split()
 	if cc.has_header(h)
-		conf.set('HAVE_' + h.to_upper().underscorify(), 1,
+		config_h.set('HAVE_' + h.to_upper().underscorify(), 1,
 			description : 'Define to 1 if you have the <' + h + '> header file')
 	endif
 endforeach
@@ -68,7 +68,7 @@ foreach f : '''
 	posix_fadvise
 '''.split()
 	if cc.has_function(f, args : '-D_GNU_SOURCE')
-		conf.set('HAVE_' + f.to_upper(), 1,
+		config_h.set('HAVE_' + f.to_upper(), 1,
 			description : 'Define to 1 if you have the ' + f + ' function')
 	endif
 endforeach
@@ -82,7 +82,7 @@ if cc.compiles('
 		return 0;
 	}
 ', name : 'program_invocation_short_name')
-	conf.set('HAVE_PROGRAM_INVOCATION_SHORT_NAME', 1,
+	config_h.set('HAVE_PROGRAM_INVOCATION_SHORT_NAME', 1,
 		description : 'Define if program_invocation_short_name is defined')
 endif
 
@@ -97,14 +97,15 @@ if cc.compiles('
 		return 0;
 	}
 ', name : '__progname')
-	conf.set('HAVE___PROGNAME', 1,
+	config_h.set('HAVE___PROGNAME', 1,
 		description : 'Define if __progname is defined')
 endif
 
 # Write config.h file.
-config_h = configure_file(
+configure_file(
 	output : 'config.h',
-	configuration : conf)
+	configuration : config_h
+)
 
 # Add a version number to special header file that is similar with output of
 # gnulib/build-aux/git-version-gen version.  Unfortunately vcs_tag() does
@@ -128,13 +129,14 @@ executable('outlier', 'outlier.c', git_version_h,
 # Manual page has couple '@variable@' style strings that configure_file()
 # will replace.  This is similar to autotools output variables done with
 # AC_SUBST and AC_SUBST_FILE.
-docconf = configuration_data()
-docconf.set('version', meson.project_version())
-docconf.set('default_multiplier', default_multiplier)
+man_vars = configuration_data()
+man_vars.set('version', meson.project_version())
+man_vars.set('default_multiplier', default_multiplier)
 man_page = configure_file(input : 'outlier.1.in',
 	output : 'outlier.1',
-	configuration : docconf
+	configuration : man_vars
 )
+
 # Use of configure_file() return value means generator must run before
 # install_man() can proceed.  This is a meson way to do ordering.
 install_man(man_page)
