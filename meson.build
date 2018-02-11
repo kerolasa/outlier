@@ -116,13 +116,9 @@ git_version_h = vcs_tag(
 	output : 'git-version.h'
 )
 
-# The include directory contains config.h and git-version.h.
-includes = include_directories('.')
-
 # Instructions compile the executable, and markup to install it.
 executable('outlier', 'outlier.c', git_version_h,
 	dependencies : libxml2_dep,
-	include_directories : includes,
 	install : true
 )
 
