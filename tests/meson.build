@@ -1,10 +1,10 @@
-test_scripts = [
-	'csv',
-	'errors',
-	'simple',
-	'whiskers',
-	'yaml',
-]
+test_scripts = '''
+	csv
+	errors
+	simple
+	whiskers
+	yaml
+'''.split()
 if libxml2_dep.found()
 	test_scripts += [
 		'rrd',

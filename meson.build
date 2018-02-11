@@ -35,20 +35,20 @@ else
 endif
 conf.set10('HAVE_LIBXML2', libxml2_dep.found())
 
-foreach h : [
-	'stdio_ext.h',
-]
+foreach h : '''
+	stdio_ext.h
+'''.split()
 	if cc.has_header(h)
 		conf.set('HAVE_' + h.to_upper().underscorify(), 1,
 			description : 'Define to 1 if you have the <' + h + '> header file')
 	endif
 endforeach
 
-foreach f : [
-	'__fpending',
-	'getexecname',
-	'posix_fadvise',
-]
+foreach f : '''
+	__fpending
+	getexecname
+	posix_fadvise
+'''.split()
 	if cc.has_function(f, args : '-D_GNU_SOURCE')
 		conf.set('HAVE_' + f.to_upper(), 1,
 			description : 'Define to 1 if you have the ' + f + ' function')
