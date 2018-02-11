@@ -1,5 +1,5 @@
-option('DEFAULT_MULTIPLIER', type : 'string', value : '1.5',
+option('default_multiplier', type : 'string', value : '1.5',
 	description : 'Default --whiskers multiplier')
 
-option('USE_LIBXML2', type : 'boolean', value : true,
+option('use_libxml2', type : 'boolean', value : true,
 	description : 'Try to build with libxml2 support')

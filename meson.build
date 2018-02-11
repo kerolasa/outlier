@@ -25,12 +25,12 @@ conf.set_quoted('PACKAGE_BUGREPORT', 'kerolasa@iki.fi')
 # Use all features.  See features.h for details.
 conf.set('_GNU_SOURCE', 1)
 
-# Validate 'meson configure build -DDEFAULT_MULTIPLIER=' value.  Because
+# Validate 'meson configure build -Ddefault_multiplier=' value.  Because
 # meson does not support float data type this is a bit klunky, but works.
-default_multiplier = get_option('DEFAULT_MULTIPLIER')
+default_multiplier = get_option('default_multiplier')
 multiplier_arr = default_multiplier.split('.')
 if 2 < multiplier_arr.length()
-	error('invalid DEFAULT_MULTIPLIER, should be: int.int')
+	error('invalid default_multiplier, should be: int.int')
 endif
 foreach i : multiplier_arr
 	num = i.to_int()
@@ -38,8 +38,8 @@ endforeach
 conf.set('DEFAULT_MULTIPLIER', default_multiplier)
 
 # By default try to compile with libxml2, but that can be turned off with
-# 'meson configure -DUSE_LIBXML2=false'.
-if get_option('USE_LIBXML2')
+# 'meson configure -Duse_libxml2=false'.
+if get_option('use_libxml2')
 	libxml2_dep = dependency('libxml-2.0', required : false)
 else
 	# disabler() would be better, but see commit 486639ec70d08338fe03
