@@ -74,14 +74,14 @@ foreach f : '''
 endforeach
 
 # Check if program_invocation_short_name global variable exists.
-if cc.compiles('
+if cc.compiles('''
 	#define _GNU_SOURCE
 	#include <errno.h>
 	int main(void) {
 		program_invocation_short_name = "test";
 		return 0;
 	}
-', name : 'program_invocation_short_name')
+''', name : 'program_invocation_short_name')
 	config_h.set('HAVE_PROGRAM_INVOCATION_SHORT_NAME', 1,
 		description : 'Define if program_invocation_short_name is defined')
 endif
@@ -89,14 +89,14 @@ endif
 # Check if __progname global variable exists.  After these knowing how to
 # perform libc implementation / compiler feature / and so on checks should
 # be clear.
-if cc.compiles('
+if cc.compiles('''
 	extern char *__progname;
 	int main(void) {
 		if (*__progname == 0)
 			return 1;
 		return 0;
 	}
-', name : '__progname')
+''', name : '__progname')
 	config_h.set('HAVE___PROGNAME', 1,
 		description : 'Define if __progname is defined')
 endif
