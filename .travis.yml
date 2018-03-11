@@ -14,7 +14,7 @@ install:
   - export PATH="`pwd`/ninjadir:${PATH}"
   - wget https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip
   - unzip ninja-linux.zip -d ninjadir
-  - pip3 install --user meson
+  - pip3 install meson
 compiler:
   - gcc
   - clang
