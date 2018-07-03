@@ -167,7 +167,8 @@ static inline void close_stdout(void)
 		_exit(EXIT_FAILURE);
 }
 
-static void *xmalloc(const size_t size)
+static __attribute__((malloc))
+void *xmalloc(const size_t size)
 {
 	void *ret = malloc(size);
 
