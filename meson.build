@@ -7,7 +7,7 @@ project('outlier', 'c',
 	],
 	license : 'BSD 2-clause',
 	version : '1.0',
-	meson_version : '>= 0.44.0',
+	meson_version : '>= 0.47.0',
 )
 
 # C compiler found here will run various checks later.
