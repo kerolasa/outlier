@@ -197,6 +197,14 @@ static double xstrtod(const char *restrict str, const char *restrict errmesg)
 	num = strtod(str, &end);
 	if (errno || str == end || (end && *end))
 		goto err;
+	switch (fpclassify(num)) {
+	case FP_NORMAL:
+	case FP_ZERO:
+		break;
+	default:
+		errno = ERANGE;
+		goto err;
+	}
 	return num;
  err:
 	if (errno)
@@ -379,7 +387,7 @@ static int process_file(const char *restrict file, struct outlier_conf *restrict
 	q1 = find_quartile(n, 1, conf->list);
 	mean = find_mean(n, conf->list);
 	q3 = find_quartile(n, 3, conf->list);
-	if (conf->whiskers) {
+	if (fpclassify(conf->whiskers) != FP_ZERO) {
 		range = (q3 - q1) * conf->whiskers;
 		if (conf->min_set && q1 - range < conf->min)
 			lof = conf->min;
@@ -484,7 +492,7 @@ int main(const int argc, char **argv)
 		errx(EXIT_FAILURE, "--csv and --yaml are mutually exclusive");
 	conf.list = xmalloc(conf.list_sz * sizeof(double));
 	if (argc == optind) {
-		if (conf.csv && conf.whiskers)
+		if (conf.csv && fpclassify(conf.whiskers) != FP_ZERO)
 			printf("lof,q1,m,q3,hif,range,samples\n");
 		else if (conf.csv)
 			printf("q1,m,q3,samples\n");
@@ -496,7 +504,7 @@ int main(const int argc, char **argv)
 	} else {
 		int i;
 
-		if (conf.csv && conf.whiskers)
+		if (conf.csv && fpclassify(conf.whiskers) != FP_ZERO)
 			puts("name,lof,q1,m,q3,hif,range,samples");
 		else if (conf.csv)
 			puts("q1,m,q3,samples");

@@ -6,3 +6,7 @@ simple.dat: lof: 68.500000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 73.0000
 simple.dat: lof: -1466.000000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 1607.500000 (range: 1536.000000 samples: 12)
 1048576
 simple.dat: lof: -1572794.000000 q1: 70.000000 m: 70.500000 q3: 71.500000 hif: 1572935.500000 (range: 1572864.000000 samples: 12)
+nan
+outlier: failed to parse multiplier: 'nan': Numerical result out of range
+inf
+outlier: failed to parse multiplier: 'inf': Numerical result out of range

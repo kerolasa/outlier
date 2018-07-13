@@ -20,6 +20,12 @@ outlier --whiskers 1024 $top_srcdir/tests/inputs/simple.dat >> tests/outputs/$IA
 echo "1048576" >> tests/outputs/$IAM
 outlier --whiskers 1048576 $top_srcdir/tests/inputs/simple.dat >> tests/outputs/$IAM
 
+echo "nan" >> tests/outputs/$IAM
+outlier --whiskers nan $top_srcdir/tests/inputs/simple.dat >> tests/outputs/$IAM 2>&1
+
+echo "inf" >> tests/outputs/$IAM
+outlier --whiskers inf $top_srcdir/tests/inputs/simple.dat >> tests/outputs/$IAM 2>&1
+
 sed -i "s|$top_srcdir/tests/inputs/||g" tests/outputs/$IAM
 diff -u $top_srcdir/tests/expected/$IAM tests/outputs/$IAM
 exit $?
