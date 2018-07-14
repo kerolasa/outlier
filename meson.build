@@ -49,6 +49,9 @@ endif
 # zero.  Use '#if HAVE_LIBXML2' preprocessor directive when checking these.
 config_h.set10('HAVE_LIBXML2', libxml2_dep.found())
 
+# The fpclassify() requires linking with libm.
+libm = cc.find_library('m')
+
 # Check headers, and if found add HAVE_HEADER_NAME_H markup to config.h
 # file.  Use '#ifdef' preprocessor directive when checking these.  If you
 # are porting from autotools you should not need any code changes.
@@ -118,7 +121,7 @@ git_version_h = vcs_tag(
 
 # Instructions compile the executable, and markup to install it.
 executable('outlier', 'outlier.c', git_version_h,
-	dependencies : libxml2_dep,
+	dependencies : [ libxml2_dep, libm ],
 	install : true
 )
 
