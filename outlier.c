@@ -214,7 +214,11 @@ static double xstrtod(const char *restrict str, const char *restrict errmesg)
 
 static int comp_double(const void *restrict a, const void *restrict b)
 {
-	return *(double *)a < *(double *)b ? -1 : *(double *)a > *(double *)b ? 1 : 0;
+	if (isless(*(const double *)a, *(const double *)b))
+		return -1;
+	else if (isless(*(const double *)b, *(const double *)a))
+		return 1;
+	return 0;
 }
 
 #if HAVE_LIBXML2
@@ -225,7 +229,7 @@ static void find_min_max(const xmlXPathContextPtr xpathCtx, struct outlier_conf 
 	double d;
 	int matches;
 
-	if ((xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_MIN, xpathCtx)) && !conf->min_set) {
+	if ((xpathObj = xmlXPathEvalExpression((const xmlChar *)RRD_MIN, xpathCtx)) && !conf->min_set) {
 		value = (char *)xmlNodeGetContent(xpathObj->nodesetval->nodeTab[0]);
 		matches = sscanf(value, "%le", &d);
 		if (matches != 0 && !isnan(d)) {
@@ -233,7 +237,7 @@ static void find_min_max(const xmlXPathContextPtr xpathCtx, struct outlier_conf 
 			conf->min_set = 1;
 		}
 	}
-	if ((xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_MAX, xpathCtx)) && !conf->max_set) {
+	if ((xpathObj = xmlXPathEvalExpression((const xmlChar *)RRD_MAX, xpathCtx)) && !conf->max_set) {
 		value = (char *)xmlNodeGetContent(xpathObj->nodesetval->nodeTab[0]);
 		matches = sscanf(value, "%le", &d);
 		if (matches != 0 && !isnan(d)) {
@@ -289,7 +293,7 @@ static size_t execute_xpath_expression(const char *restrict filename, struct out
 	if (!(xpathCtx = xmlXPathNewContext(doc)))
 		errx(EXIT_FAILURE, "unable to create new XPath context");
 	find_min_max(xpathCtx, conf);
-	if (!(xpathObj = xmlXPathEvalExpression(BAD_CAST RRD_DATA, xpathCtx)))
+	if (!(xpathObj = xmlXPathEvalExpression((const xmlChar *)RRD_DATA, xpathCtx)))
 		errx(EXIT_FAILURE, "unable to evaluate xpath expression: %s", RRD_DATA);
 	ret = collect_data(xpathObj->nodesetval, conf);
 	xmlXPathFreeObject(xpathObj);
