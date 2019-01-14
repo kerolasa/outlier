@@ -33,7 +33,7 @@ OPTIONS
               lof  and  hif  to be closer (multiplier < 1.0) or further (1.0 <
               multplier).  The default multiplier is 1.5.  If the dump has  in
               definition for min and/or max data set values they are used as a
-              minimun and maximum printout values for lof  and  hif  when  the
+              minimum and maximum printout values for lof  and  hif  when  the
               calculated  value  is  out  of range.  When multiplier is set to
               zero printing (and related computation) of lof, hif and range is
               omitted.

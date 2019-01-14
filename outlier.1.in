@@ -52,7 +52,7 @@ to be closer
 The default multiplier is
 .BR @default_multiplier@ .
 If the dump has in definition for min and/or max data set values they are
-used as a minimun and maximum printout values for
+used as a minimum and maximum printout values for
 .I lof
 and
 .I hif
