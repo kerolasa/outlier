@@ -9,7 +9,7 @@ addons:
     packages:
       - "python3-pip"
 install:
-  - export NINJA_LATEST="$(curl -s https://api.github.com/repos/ninja-build/ninja/releases/latest | awk -F\" '/browser_download_url.*ninja-linux.zip/ {print $4; exit}')"
+  - export NINJA_LATEST="https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip"
   - wget "$NINJA_LATEST"
   - unzip -q ninja-linux.zip -d build
   - export PATH="$PWD/build:$PATH"
