@@ -172,7 +172,7 @@ void *xmalloc(const size_t size)
 {
 	void *ret = malloc(size);
 
-	if (!ret && size)
+	if (!ret)
 		err(EXIT_FAILURE, "cannot allocate %zu bytes", size);
 	return ret;
 }
@@ -181,7 +181,7 @@ static void *xrealloc(void *restrict ptr, const size_t size)
 {
 	void *ret = realloc(ptr, size);
 
-	if (!ret && size)
+	if (!ret)
 		err(EXIT_FAILURE, "cannot allocate %zu bytes", size);
 	return ret;
 }
@@ -325,10 +325,13 @@ static size_t read_digits(const char *restrict file, struct outlier_conf *restri
 	fd = fopen(file, "r");
 	if (!fd)
 		err(EXIT_FAILURE, "%s", file);
-	if (fstat(fileno(fd), &sbuf))
+	if (fstat(fileno(fd), &sbuf)) {
+		fclose(fd);
 		err(EXIT_FAILURE, "cannot stat: %s", file);
+	}
 	if (S_ISDIR(sbuf.st_mode)) {
 		warnx("%s: is directory, skipping", file);
+		fclose(fd);
 		return 0;
 	}
 #ifdef HAVE_POSIX_FADVISE
@@ -359,6 +362,7 @@ static size_t read_digits(const char *restrict file, struct outlier_conf *restri
 		}
 		lp++;
 	}
+	fclose(fd);
 	return n;
 }
 
